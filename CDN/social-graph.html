@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Celera - Social Graph</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/celera.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .graph-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1.5rem;
+            height: calc(100vh - 200px);
+        }
+        .graph-controls {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+        .graph-visualization {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+        .graph-svg {
+            width: 100%;
+            height: 100%;
+        }
+        .node {
+            cursor: pointer;
+        }
+        .node.contact {
+            fill: var(--accent-color);
+        }
+        .node.account {
+            fill: var(--success-color);
+        }
+        .node.deal {
+            fill: var(--warning-color);
+        }
+        .node-label {
+            font-size: 12px;
+            pointer-events: none;
+            fill: var(--text-primary);
+            font-weight: 600;
+        }
+        .link {
+            stroke: var(--border-color);
+            stroke-width: 2;
+            fill: none;
+            opacity: 0.6;
+        }
+        .link.reports_to {
+            stroke: var(--accent-color);
+            stroke-width: 3;
+        }
+        .link.decision_maker_for {
+            stroke: var(--success-color);
+            stroke-width: 3;
+        }
+        .link.works_with {
+            stroke: var(--text-secondary);
+            stroke-width: 2;
+        }
+        .node-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .filter-select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+        }
+        .influence-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .influence-high {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+        .influence-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+        }
+        .influence-low {
+            background: rgba(107, 114, 128, 0.2);
+            color: var(--text-secondary);
+        }
+        .legend {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        .legend-line {
+            width: 30px;
+            height: 2px;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>🎯 Celera</h1>
+            <p>Sales Intelligence Platform</p>
+        </div>
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="/dashboard.html" class="sidebar-nav-link">
+                        <i>📊</i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/sales/pipeline.html" class="sidebar-nav-link">
+                        <i>💼</i>
+                        <span>Deals</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header disabled">
+                            <div class="sidebar-nav-group-title">
+                                <i>📈</i>
+                                <span>Marketing</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📢</i>
+                                    <span>Campaigns</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📊</i>
+                                    <span>Ads Performance</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>🔗</i>
+                                    <span>Lead Sources</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header">
+                            <div class="sidebar-nav-group-title">
+                                <i>🤖</i>
+                                <span>AI Tools</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/roleplay.html" class="sidebar-nav-submenu-link">
+                                    <i>🎭</i>
+                                    <span>Roleplay Practice</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/prep.html" class="sidebar-nav-submenu-link">
+                                    <i>💡</i>
+                                    <span>Call Prep AI</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/analysis.html" class="sidebar-nav-submenu-link">
+                                    <i>🔍</i>
+                                    <span>Conversation Analysis</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/settings.html" class="sidebar-nav-link">
+                        <i>⚙️</i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle">☰</button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Social Graph</h1>
+            <p>Visualize relationships, influence, and connections across your network</p>
+        </div>
+
+        <div class="graph-container">
+            <!-- Controls -->
+            <div class="graph-controls">
+                <div class="filter-group">
+                    <div class="filter-label">Filter by Account</div>
+                    <select class="filter-select" id="account-filter" onchange="filterGraph()">
+                        <option value="">All Accounts</option>
+                        <option value="account_1">Acme Corporation</option>
+                        <option value="account_2">TechStart Inc</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-label">Filter by Deal</div>
+                    <select class="filter-select" id="deal-filter" onchange="filterGraph()">
+                        <option value="">All Deals</option>
+                        <option value="deal_1">Q4 Enterprise License</option>
+                        <option value="deal_2">Q1 Starter Package</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <div class="filter-label">Min Influence Score</div>
+                    <select class="filter-select" id="influence-filter" onchange="filterGraph()">
+                        <option value="0">All Contacts</option>
+                        <option value="70">High (70+)</option>
+                        <option value="50">Medium (50+)</option>
+                        <option value="30">Low (30+)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <button class="btn btn-primary" onclick="resetGraph()" style="width: 100%;">
+                        Reset View
+                    </button>
+                </div>
+                <div class="legend">
+                    <div class="filter-label">Legend</div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-color);"></div>
+                        <span>Contacts</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--success-color);"></div>
+                        <span>Accounts</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--warning-color);"></div>
+                        <span>Deals</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line" style="background: var(--accent-color);"></div>
+                        <span>Reports To</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-line" style="background: var(--success-color);"></div>
+                        <span>Decision Maker</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graph Visualization -->
+            <div class="graph-visualization">
+                <svg class="graph-svg" id="graph-svg"></svg>
+                <div class="node-tooltip" id="node-tooltip"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/tool.js"></script>
+    <script src="js/hubspot-service.js"></script>
+    <script src="js/linkedin-service.js"></script>
+    <script src="js/graph-service.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/graph-visualization.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,23 @@
+{
+  "name": "websdk-cdn",
+  "version": "5.0.0",
+  "description": "Zoom sample app for MeetingSDK-Web client view",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "set NODE_ENV=development && set BABEL_ENV=development && node corp.js --corp",
+    "https": "set NODE_ENV=development && set BABEL_ENV=development && node corp.js --corp --https",
+    "webhook": "node webhook-server.js"
+  },
+  "author": "Zoom Communications, Inc.",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "devDependencies": {
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.2"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2"
+  }
+}

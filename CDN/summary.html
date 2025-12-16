@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Celera - Call Debrief</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/celera.css">
+    <style>
+        /* Debrief Page Specific Styles */
+        .debrief-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .debrief-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .debrief-save-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .debrief-save-btn:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+        .debrief-section {
+            margin-bottom: 2rem;
+        }
+        .debrief-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        /* Next Steps Editor */
+        .next-steps-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .next-step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--content-bg);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+        .next-step-item input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+        }
+        .next-step-item input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .next-step-remove {
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            color: var(--error-color);
+            cursor: pointer;
+            font-size: 1.25rem;
+            line-height: 1;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .next-step-remove:hover {
+            opacity: 1;
+        }
+        .add-next-step-btn {
+            padding: 0.75rem 1rem;
+            background: var(--content-bg);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .add-next-step-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        /* Debrief Editor */
+        .debrief-editor {
+            min-height: 200px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: white;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .debrief-editor:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .debrief-editor:empty:before {
+            content: attr(placeholder);
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+        /* Participants List */
+        .participants-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .participant-badge {
+            padding: 0.5rem 1rem;
+            background: var(--content-bg);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        .participant-badge.you {
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        /* Hide sidebar on debrief page */
+        .sidebar {
+            display: none;
+        }
+        .main-content {
+            margin-left: 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Debrief Header with Save Button -->
+        <div class="debrief-header">
+            <div class="debrief-title">Call Debrief</div>
+            <button class="debrief-save-btn" onclick="saveDebrief()">Save</button>
+        </div>
+
+        <!-- Next Steps Section (First) -->
+        <div class="card debrief-section">
+            <div class="debrief-section-title">
+                <i>✅</i>
+                <span>Next Steps</span>
+            </div>
+            <ul class="next-steps-list" id="next-steps-list">
+                <!-- Will be populated by JavaScript -->
+            </ul>
+            <button class="add-next-step-btn" onclick="addNextStep()">
+                + Add Next Step
+            </button>
+        </div>
+
+        <!-- Debrief Section (Second) -->
+        <div class="card debrief-section">
+            <div class="debrief-section-title">
+                <i>📝</i>
+                <span>Debrief</span>
+            </div>
+            <div 
+                class="debrief-editor" 
+                id="debrief-editor" 
+                contenteditable="true"
+                placeholder="Call debrief will be auto-populated here..."
+            ></div>
+        </div>
+
+        <!-- Participants Section (Third) -->
+        <div class="card debrief-section">
+            <div class="debrief-section-title">
+                <i>👥</i>
+                <span>Who Attended</span>
+            </div>
+            <div class="participants-grid" id="participants-list">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </main>
+
+    <script src="js/tool.js"></script>
+    <script src="js/data-service.js"></script>
+    <script src="js/graph-service.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/summary.js"></script>
+</body>
+</html>

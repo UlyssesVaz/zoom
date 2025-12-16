@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Celera - Settings</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/celera.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>🎯 Celera</h1>
+            <p>Sales Intelligence Platform</p>
+        </div>
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="/dashboard.html" class="sidebar-nav-link">
+                        <i>📊</i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/sales/pipeline.html" class="sidebar-nav-link">
+                        <i>💼</i>
+                        <span>Deals</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/social-graph.html" class="sidebar-nav-link">
+                        <i>🕸️</i>
+                        <span>Social Graph</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header disabled">
+                            <div class="sidebar-nav-group-title">
+                                <i>📈</i>
+                                <span>Marketing</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📢</i>
+                                    <span>Campaigns</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📊</i>
+                                    <span>Ads Performance</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>🔗</i>
+                                    <span>Lead Sources</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header">
+                            <div class="sidebar-nav-group-title">
+                                <i>🤖</i>
+                                <span>AI Tools</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/roleplay.html" class="sidebar-nav-submenu-link">
+                                    <i>🎭</i>
+                                    <span>Roleplay Practice</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/prep.html" class="sidebar-nav-submenu-link">
+                                    <i>💡</i>
+                                    <span>Call Prep AI</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/analysis.html" class="sidebar-nav-submenu-link">
+                                    <i>🔍</i>
+                                    <span>Conversation Analysis</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/settings.html" class="sidebar-nav-link active">
+                        <i>⚙️</i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle">☰</button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Settings</h1>
+            <p>Configure your Celera account and integrations</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i>🔗</i>
+                    <span>CRM Integration</span>
+                </h2>
+            </div>
+            <div class="form-group">
+                <label class="form-label">HubSpot Integration</label>
+                <div style="padding: 1rem; background: var(--content-bg); border-radius: 8px; margin-top: 0.5rem;">
+                    <p style="margin-bottom: 0.5rem;">Status: <span style="color: var(--success-color); font-weight: 600;">Connected</span></p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                        Your HubSpot account is connected. Data sync is handled automatically by the backend.
+                    </p>
+                    <button class="btn btn-secondary" style="margin-right: 0.5rem;">Reconnect</button>
+                    <button class="btn btn-secondary">Disconnect</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i>📅</i>
+                    <span>Calendar Integration</span>
+                </h2>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Google Calendar</label>
+                <div id="google-calendar-status" style="padding: 1rem; background: var(--content-bg); border-radius: 8px; margin-top: 0.5rem;">
+                    <!-- Status will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i>🔐</i>
+                    <span>OAuth Integrations</span>
+                </h2>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Google Account</label>
+                <div id="google-oauth-status" style="padding: 1rem; background: var(--content-bg); border-radius: 8px; margin-top: 0.5rem;">
+                    <!-- Status will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label class="form-label">LinkedIn Account</label>
+                <div id="linkedin-oauth-status" style="padding: 1rem; background: var(--content-bg); border-radius: 8px; margin-top: 0.5rem;">
+                    <!-- Status will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i>🔑</i>
+                    <span>API Configuration</span>
+                </h2>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Zoom Meeting SDK</label>
+                <div style="padding: 1rem; background: var(--content-bg); border-radius: 8px; margin-top: 0.5rem;">
+                    <p style="margin-bottom: 0.5rem;">Status: <span style="color: var(--success-color); font-weight: 600;">Configured</span></p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Zoom SDK credentials are configured on the backend auth endpoint.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i>🤖</i>
+                    <span>Yoodli AI Integration</span>
+                </h2>
+            </div>
+            <div class="form-group">
+                <label class="form-label">API Key</label>
+                <input type="password" class="form-control" id="yoodli-api-key" placeholder="Enter Yoodli API Key" style="margin-top: 0.5rem;" value="">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    Get your API key from <a href="https://developers.yoodli.ai/docs/api-keys" target="_blank" style="color: var(--accent-color);">Yoodli Developer Portal</a>
+                </p>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Organization ID</label>
+                <input type="text" class="form-control" id="yoodli-org-id" placeholder="Enter Organization ID" style="margin-top: 0.5rem;" value="">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    Find your Org ID in your organization settings page
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                <button class="btn btn-primary" onclick="saveYoodliConfig()">Save Configuration</button>
+                <button class="btn btn-secondary" onclick="testYoodliConnection()">Test Connection</button>
+            </div>
+            <div id="yoodli-status" style="margin-top: 1rem; display: none;"></div>
+        </div>
+    </main>
+
+    <script src="js/tool.js"></script>
+    <script src="js/yoodli-service.js"></script>
+    <script src="js/google-service.js"></script>
+    <script src="js/google-calendar-service.js"></script>
+    <script src="js/linkedin-service.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        // Load saved Yoodli configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            const apiKey = localStorage.getItem('yoodli_api_key') || '';
+            const orgId = localStorage.getItem('yoodli_org_id') || '';
+            
+            document.getElementById('yoodli-api-key').value = apiKey;
+            document.getElementById('yoodli-org-id').value = orgId;
+            
+            if (apiKey && orgId) {
+                showStatus('Configuration loaded', 'success');
+            }
+        });
+        
+        function saveYoodliConfig() {
+            const apiKey = document.getElementById('yoodli-api-key').value.trim();
+            const orgId = document.getElementById('yoodli-org-id').value.trim();
+            
+            if (!apiKey || !orgId) {
+                showStatus('Please enter both API Key and Organization ID', 'error');
+                return;
+            }
+            
+            localStorage.setItem('yoodli_api_key', apiKey);
+            localStorage.setItem('yoodli_org_id', orgId);
+            
+            // Update service instance
+            window.yoodliService.apiKey = apiKey;
+            window.yoodliService.orgId = orgId;
+            
+            showStatus('Configuration saved successfully!', 'success');
+        }
+        
+        async function testYoodliConnection() {
+            const apiKey = document.getElementById('yoodli-api-key').value.trim();
+            const orgId = document.getElementById('yoodli-org-id').value.trim();
+            
+            if (!apiKey || !orgId) {
+                showStatus('Please enter both API Key and Organization ID first', 'error');
+                return;
+            }
+            
+            // Temporarily update service
+            const originalApiKey = window.yoodliService.apiKey;
+            const originalOrgId = window.yoodliService.orgId;
+            
+            window.yoodliService.apiKey = apiKey;
+            window.yoodliService.orgId = orgId;
+            
+            showStatus('Testing connection...', 'info');
+            
+            try {
+                const result = await window.yoodliService.testConnection();
+                showStatus('Connection successful! API is working.', 'success');
+            } catch (error) {
+                showStatus(`Connection failed: ${error.message}`, 'error');
+                // Restore original values
+                window.yoodliService.apiKey = originalApiKey;
+                window.yoodliService.orgId = originalOrgId;
+            }
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('yoodli-status');
+            statusDiv.style.display = 'block';
+            
+            const colors = {
+                success: 'var(--success-color)',
+                error: 'var(--error-color)',
+                info: 'var(--accent-color)'
+            };
+            
+            const backgrounds = {
+                success: 'rgba(16, 185, 129, 0.1)',
+                error: 'rgba(239, 68, 68, 0.1)',
+                info: 'rgba(102, 126, 234, 0.1)'
+            };
+            
+            statusDiv.style.background = backgrounds[type] || backgrounds.info;
+            statusDiv.style.borderLeft = `4px solid ${colors[type] || colors.info}`;
+            statusDiv.style.color = colors[type] || colors.info;
+            statusDiv.style.padding = '1rem';
+            statusDiv.style.borderRadius = '8px';
+            statusDiv.textContent = message;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        // OAuth Integration Status
+        function updateOAuthStatus() {
+            // Google OAuth Status
+            const googleStatus = document.getElementById('google-oauth-status');
+            if (window.googleService && window.googleService.isConfigured()) {
+                const profile = window.googleService.getUserProfile();
+                googleStatus.innerHTML = `
+                    <p style="margin-bottom: 0.5rem;">Status: <span style="color: var(--success-color); font-weight: 600;">Connected</span></p>
+                    ${profile ? `<p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Logged in as: ${profile.email || profile.name || 'Google Account'}</p>` : ''}
+                    <button class="btn btn-secondary" onclick="disconnectGoogle()">Disconnect</button>
+                `;
+            } else {
+                googleStatus.innerHTML = `
+                    <p style="margin-bottom: 0.5rem;">Status: <span style="color: var(--text-secondary); font-weight: 600;">Not Connected</span></p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                        Connect your Google account to enable calendar integration and data enrichment.
+                    </p>
+                    <button class="btn btn-primary" onclick="connectGoogle()">Connect Google</button>
+                `;
+            }
+
+            // Google Calendar Status
+            const calendarStatus = document.getElementById('google-calendar-status');
+            if (window.googleService && window.googleService.hasCalendarAccess()) {
+                calendarStatus.innerHTML = `
+                    <p style="margin-bottom: 0.5rem;">Status: <span style="color: var(--success-color); font-weight: 600;">Connected</span></p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                        Your Google Calendar is connected. View your meetings in the Calendar page.
+                    </p>
+                    <a href="/calendar.html" class="btn btn-secondary">View Calendar</a>
+                `;
+            } else {
+                calendarStatus.innerHTML = `
+                    <p style="margin-bottom: 0.5rem;">Status: <span style="color: var(--text-secondary); font-weight: 600;">Not Connected</span></p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                        Connect Google Calendar to see upcoming meetings and join Zoom calls directly.
+                    </p>
+                    <button class="btn btn-primary" onclick="connectGoogleCalendar()">Connect Calendar</button>
+                `;
+            }
+
+            // LinkedIn OAuth Status
+            const linkedinStatus = document.getElementById('linkedin-oauth-status');
+            if (window.linkedinService && window.linkedinService.isConfigured()) {
+                linkedinStatus.innerHTML = `
+                    <p style="margin-bottom: 0.5rem;">Status: <span style="color: var(--success-color); font-weight: 600;">Connected</span></p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                        LinkedIn enrichment is enabled. Contact data will be automatically enriched with LinkedIn information.
+                    </p>
+                    <button class="btn btn-secondary" onclick="disconnectLinkedIn()">Disconnect</button>
+                `;
+            } else {
+                linkedinStatus.innerHTML = `
+                    <p style="margin-bottom: 0.5rem;">Status: <span style="color: var(--text-secondary); font-weight: 600;">Not Connected</span></p>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+                        Connect LinkedIn to enrich contact profiles with professional information and relationship data.
+                    </p>
+                    <button class="btn btn-primary" onclick="connectLinkedIn()">Connect LinkedIn</button>
+                `;
+            }
+        }
+
+        async function connectGoogle() {
+            try {
+                await window.googleService.initiateOAuth();
+            } catch (error) {
+                alert('Failed to connect Google. Please try again.');
+                console.error('Google OAuth error:', error);
+            }
+        }
+
+        async function connectGoogleCalendar() {
+            try {
+                await window.googleService.initiateOAuth();
+            } catch (error) {
+                alert('Failed to connect Google Calendar. Please try again.');
+                console.error('Google Calendar OAuth error:', error);
+            }
+        }
+
+        async function disconnectGoogle() {
+            if (confirm('Are you sure you want to disconnect your Google account?')) {
+                try {
+                    await window.googleService.disconnect();
+                    updateOAuthStatus();
+                } catch (error) {
+                    alert('Failed to disconnect Google account.');
+                    console.error('Disconnect error:', error);
+                }
+            }
+        }
+
+        async function connectLinkedIn() {
+            try {
+                await window.linkedinService.initiateOAuth();
+            } catch (error) {
+                alert('Failed to connect LinkedIn. Please try again.');
+                console.error('LinkedIn OAuth error:', error);
+            }
+        }
+
+        async function disconnectLinkedIn() {
+            if (confirm('Are you sure you want to disconnect your LinkedIn account?')) {
+                try {
+                    await window.linkedinService.disconnect();
+                    updateOAuthStatus();
+                } catch (error) {
+                    alert('Failed to disconnect LinkedIn account.');
+                    console.error('Disconnect error:', error);
+                }
+            }
+        }
+
+        // Update OAuth status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for OAuth callback
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const provider = urlParams.get('provider');
+            
+            if (code && provider) {
+                handleOAuthCallback(code, provider);
+            } else {
+                updateOAuthStatus();
+            }
+        });
+
+        async function handleOAuthCallback(code, provider) {
+            try {
+                if (provider === 'google') {
+                    await window.googleService.handleCallback(code);
+                    window.googleService.setCalendarAccess(true);
+                } else if (provider === 'linkedin') {
+                    await window.linkedinService.handleCallback(code);
+                }
+                
+                // Remove code from URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+                // Update status
+                updateOAuthStatus();
+                
+                alert(`${provider === 'google' ? 'Google' : 'LinkedIn'} account connected successfully!`);
+            } catch (error) {
+                console.error('OAuth callback error:', error);
+                alert(`Failed to complete ${provider === 'google' ? 'Google' : 'LinkedIn'} connection.`);
+                updateOAuthStatus();
+            }
+        }
+    </script>
+</body>
+</html>
+

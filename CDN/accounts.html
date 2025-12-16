@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Celera - Accounts</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/celera.css">
+    <style>
+        /* Clean, minimal header - no tabs */
+        .accounts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .header-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .header-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        /* Subtle filter - minimal presence */
+        .filter-dropdown {
+            position: relative;
+        }
+        
+        .filter-trigger {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .filter-trigger:hover {
+            border-color: var(--accent-color);
+        }
+        
+        /* Account card - primary focus */
+        .account-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .account-card:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+        
+        .account-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+        
+        .account-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .account-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        /* Rank indicator - subtle but clear */
+        .account-rank {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--content-bg);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+        }
+        
+        /* Key metrics at a glance */
+        .account-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+        
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .metric-value.highlight {
+            color: var(--accent-color);
+        }
+        
+        /* Status indicator */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+        
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        
+        .status-badge.closed {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
+        
+        /* Quick action hint */
+        .account-action-hint {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .account-card:hover .account-action-hint {
+            opacity: 1;
+        }
+        
+        /* Overview stats bar - at a glance */
+        .overview-stats {
+            display: flex;
+            gap: 2rem;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Search bar */
+        .search-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>🎯 Celera</h1>
+            <p>Sales Intelligence Platform</p>
+        </div>
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="/dashboard.html" class="sidebar-nav-link">
+                        <i>📊</i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header expanded active">
+                            <div class="sidebar-nav-group-title">
+                                <i>💼</i>
+                                <span>Deals</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/accounts.html" class="sidebar-nav-submenu-link active">
+                                    <i>🏢</i>
+                                    <span>Accounts</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/sales/pipeline.html" class="sidebar-nav-submenu-link">
+                                    <i>📋</i>
+                                    <span>Pipeline</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/prep.html" class="sidebar-nav-submenu-link">
+                                    <i>🎯</i>
+                                    <span>Pre-Call Prep</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/sales/calls.html" class="sidebar-nav-submenu-link">
+                                    <i>📞</i>
+                                    <span>Active Calls</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/social-graph.html" class="sidebar-nav-submenu-link">
+                                    <i>🕸️</i>
+                                    <span>Social Graph</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header disabled">
+                            <div class="sidebar-nav-group-title">
+                                <i>📈</i>
+                                <span>Marketing</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📢</i>
+                                    <span>Campaigns</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📊</i>
+                                    <span>Ads Performance</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>🔗</i>
+                                    <span>Lead Sources</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header">
+                            <div class="sidebar-nav-group-title">
+                                <i>🤖</i>
+                                <span>AI Tools</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/roleplay.html" class="sidebar-nav-submenu-link">
+                                    <i>🎭</i>
+                                    <span>Roleplay Practice</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/prep.html" class="sidebar-nav-submenu-link">
+                                    <i>💡</i>
+                                    <span>Call Prep AI</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/analysis.html" class="sidebar-nav-submenu-link">
+                                    <i>🔍</i>
+                                    <span>Conversation Analysis</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/settings.html" class="sidebar-nav-link">
+                        <i>⚙️</i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle">☰</button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="accounts-header">
+            <div>
+                <h1 class="header-title">Accounts</h1>
+                <p class="header-subtitle">Overview of your accounts and opportunities</p>
+            </div>
+            <div class="filter-dropdown">
+                <div class="filter-trigger" onclick="toggleFilterDropdown()">
+                    <span id="filter-text">All Accounts</span>
+                    <span>▼</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- At-a-glance overview -->
+        <div class="overview-stats" id="overview-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="total-accounts">-</div>
+                <div class="stat-label">Total Accounts</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="active-deals">-</div>
+                <div class="stat-label">Active Deals</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="pipeline-value">-</div>
+                <div class="stat-label">Pipeline Value</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="this-week">-</div>
+                <div class="stat-label">This Week</div>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-container">
+            <input type="text" class="search-input" id="search-input" placeholder="Search accounts, contacts, deals..." onkeyup="filterAccounts()">
+        </div>
+
+        <!-- Account list - primary focus -->
+        <div id="accounts-list">
+            <div class="empty-state">Loading accounts...</div>
+        </div>
+    </main>
+
+    <script src="js/tool.js"></script>
+    <script src="js/hubspot-service.js"></script>
+    <script src="js/linkedin-service.js"></script>
+    <script src="js/data-service.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        let allAccounts = [];
+        let filteredAccounts = [];
+
+        // Account card template
+        function renderAccountCard(account, index) {
+            const rank = index + 1;
+            let statusClass = 'active';
+            let statusText = 'Active';
+            
+            if (account.stage === 'closed') {
+                statusClass = 'closed';
+                statusText = 'Closed';
+            } else if (account.probability < 30) {
+                statusClass = 'warning';
+                statusText = 'Low Probability';
+            }
+            
+            return `
+                <div class="account-card" onclick="viewAccountDetails('${account.id}')">
+                    <div class="account-rank">#${rank}</div>
+                    
+                    <div class="account-card-header">
+                        <div>
+                            <div class="account-name">${account.name}</div>
+                            <div class="account-meta">
+                                <span>${account.industry || 'Unknown Industry'}</span>
+                                <span>•</span>
+                                <span>${account.location || 'No location'}</span>
+                            </div>
+                        </div>
+                        <div class="status-badge ${statusClass}">
+                            <span>●</span>
+                            <span>${statusText}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="account-metrics">
+                        <div class="metric-item">
+                            <div class="metric-label">Deal Value</div>
+                            <div class="metric-value highlight">${formatCurrency(account.dealValue)}</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Probability</div>
+                            <div class="metric-value">${account.probability}%</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Contacts</div>
+                            <div class="metric-value">${account.contactCount || 0}</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">Last Activity</div>
+                            <div class="metric-value">${formatRelativeTime(account.lastActivity)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="account-action-hint">Click to view details →</div>
+                </div>
+            `;
+        }
+        
+        async function loadAccounts() {
+            try {
+                const pipeline = await window.dataService.getPipeline();
+                
+                // Transform pipeline data to account-focused view
+                allAccounts = pipeline.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    dealValue: item.value,
+                    probability: item.probability,
+                    stage: item.stage,
+                    lastActivity: item.lastActivity,
+                    contactCount: item.contacts?.length || 0,
+                    industry: item.industry || 'Technology',
+                    location: item.location || 'Unknown',
+                    type: item.type
+                }));
+                
+                // Sort by deal value (highest first)
+                allAccounts.sort((a, b) => b.dealValue - a.dealValue);
+                filteredAccounts = [...allAccounts];
+                
+                // Render accounts
+                renderAccounts();
+                
+                // Update overview stats
+                updateOverviewStats(allAccounts);
+                
+            } catch (error) {
+                console.error('Failed to load accounts:', error);
+                document.getElementById('accounts-list').innerHTML = 
+                    '<div class="empty-state">Failed to load accounts. Please try again.</div>';
+            }
+        }
+        
+        function renderAccounts() {
+            const accountsList = document.getElementById('accounts-list');
+            
+            if (filteredAccounts.length === 0) {
+                accountsList.innerHTML = '<div class="empty-state">No accounts found</div>';
+                return;
+            }
+            
+            accountsList.innerHTML = filteredAccounts.map((account, index) => 
+                renderAccountCard(account, index)
+            ).join('');
+        }
+        
+        function updateOverviewStats(accounts) {
+            const totalValue = accounts.reduce((sum, a) => sum + a.dealValue, 0);
+            const activeDeals = accounts.filter(a => a.stage !== 'closed').length;
+            const thisWeek = accounts.filter(a => {
+                if (!a.lastActivity) return false;
+                const date = new Date(a.lastActivity);
+                const now = new Date();
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                return date >= weekAgo;
+            }).length;
+            
+            document.getElementById('total-accounts').textContent = accounts.length;
+            document.getElementById('active-deals').textContent = activeDeals;
+            document.getElementById('pipeline-value').textContent = formatCurrency(totalValue);
+            document.getElementById('this-week').textContent = thisWeek;
+        }
+        
+        function viewAccountDetails(accountId) {
+            // Navigate to prep page with account context (or create account detail page)
+            window.location.href = `/prep.html?leadDealId=${accountId}`;
+        }
+        
+        function filterAccounts() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            
+            if (!searchTerm) {
+                filteredAccounts = [...allAccounts];
+            } else {
+                filteredAccounts = allAccounts.filter(account => 
+                    account.name.toLowerCase().includes(searchTerm) ||
+                    (account.industry && account.industry.toLowerCase().includes(searchTerm)) ||
+                    (account.location && account.location.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            renderAccounts();
+        }
+        
+        function toggleFilterDropdown() {
+            // Simple filter toggle - can be enhanced with dropdown menu
+            alert('Filter options coming soon!');
+        }
+        
+        function formatCurrency(value) {
+            if (value >= 1000000) {
+                return '$' + (value / 1000000).toFixed(1) + 'M';
+            } else if (value >= 1000) {
+                return '$' + (value / 1000).toFixed(0) + 'K';
+            }
+            return '$' + value.toLocaleString();
+        }
+        
+        function formatRelativeTime(dateString) {
+            if (!dateString) return 'Never';
+            
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 60) {
+                return `${diffMins}m ago`;
+            } else if (diffHours < 24) {
+                return `${diffHours}h ago`;
+            } else if (diffDays < 7) {
+                return `${diffDays}d ago`;
+            } else if (diffDays < 30) {
+                return `${Math.floor(diffDays / 7)}w ago`;
+            } else {
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadAccounts);
+    </script>
+</body>
+</html>
+

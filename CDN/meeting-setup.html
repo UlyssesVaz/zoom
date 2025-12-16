@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Celera - Join Meeting</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/celera.css">
+    <style>
+        .meeting-setup-container {
+            max-width: 500px;
+            margin: 4rem auto;
+        }
+        .meeting-setup-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .meeting-setup-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .meeting-setup-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .meeting-setup-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .deal-context-mini {
+            background: var(--content-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .deal-context-mini-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        .deal-context-mini-value {
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>🎯 Celera</h1>
+            <p>Sales Intelligence Platform</p>
+        </div>
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="/dashboard.html" class="sidebar-nav-link">
+                        <i>📊</i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/sales/pipeline.html" class="sidebar-nav-link">
+                        <i>💼</i>
+                        <span>Deals</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/social-graph.html" class="sidebar-nav-link">
+                        <i>🕸️</i>
+                        <span>Social Graph</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header disabled">
+                            <div class="sidebar-nav-group-title">
+                                <i>📈</i>
+                                <span>Marketing</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📢</i>
+                                    <span>Campaigns</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📊</i>
+                                    <span>Ads Performance</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>🔗</i>
+                                    <span>Lead Sources</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header">
+                            <div class="sidebar-nav-group-title">
+                                <i>🤖</i>
+                                <span>AI Tools</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/roleplay.html" class="sidebar-nav-submenu-link">
+                                    <i>🎭</i>
+                                    <span>Roleplay Practice</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/prep.html" class="sidebar-nav-submenu-link">
+                                    <i>💡</i>
+                                    <span>Call Prep AI</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/analysis.html" class="sidebar-nav-submenu-link">
+                                    <i>🔍</i>
+                                    <span>Conversation Analysis</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/settings.html" class="sidebar-nav-link">
+                        <i>⚙️</i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle">☰</button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="meeting-setup-container">
+            <div class="meeting-setup-card">
+                <div class="meeting-setup-header">
+                    <h1 class="meeting-setup-title">Join Zoom Call</h1>
+                    <p class="meeting-setup-subtitle">Enter your meeting details to join</p>
+                </div>
+
+                <!-- Deal Context -->
+                <div class="deal-context-mini" id="deal-context-mini" style="display: none;">
+                    <div class="deal-context-mini-name" id="deal-name-mini">-</div>
+                    <div class="deal-context-mini-value" id="deal-value-mini">-</div>
+                </div>
+
+                <!-- Meeting Setup Form -->
+                <form id="meeting-setup-form">
+                    <div class="form-group">
+                        <label class="form-label" for="display-name">Your Name</label>
+                        <input type="text" class="form-control" id="display-name" placeholder="Enter your name" required value="">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="meeting-number">Meeting Number</label>
+                        <input type="text" class="form-control" id="meeting-number" placeholder="Enter meeting number" required value="">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="meeting-password">Meeting Password (optional)</label>
+                        <input type="text" class="form-control" id="meeting-password" placeholder="Enter password" value="">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                        Join Call
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/tool.js"></script>
+    <script src="js/data-service.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        // Load deal context if dealId is in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const dealId = urlParams.get('dealId');
+        
+        if (dealId && window.dataService) {
+            window.dataService.getLeadDeal(dealId).then(deal => {
+                const dealContextMini = document.getElementById('deal-context-mini');
+                const dealNameMini = document.getElementById('deal-name-mini');
+                const dealValueMini = document.getElementById('deal-value-mini');
+                
+                if (deal && dealContextMini) {
+                    dealContextMini.style.display = 'block';
+                    dealNameMini.textContent = deal.accountName || deal.name || '-';
+                    
+                    // Format deal value
+                    const value = deal.value || 0;
+                    if (value >= 1000000) {
+                        dealValueMini.textContent = `$${(value / 1000000).toFixed(1)}M`;
+                    } else if (value >= 1000) {
+                        dealValueMini.textContent = `$${(value / 1000).toFixed(0)}K`;
+                    } else {
+                        dealValueMini.textContent = `$${value}`;
+                    }
+                }
+            }).catch(err => {
+                console.error('Failed to load deal context:', err);
+            });
+        }
+        
+        // Load saved settings
+        document.addEventListener('DOMContentLoaded', function() {
+            const displayName = localStorage.getItem('celera_display_name') || '';
+            const meetingNumber = localStorage.getItem('celera_meeting_number') || '';
+            const meetingPassword = localStorage.getItem('celera_meeting_password') || '';
+            
+            document.getElementById('display-name').value = displayName;
+            document.getElementById('meeting-number').value = meetingNumber;
+            document.getElementById('meeting-password').value = meetingPassword;
+        });
+        
+        // Handle form submission
+        document.getElementById('meeting-setup-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const displayName = document.getElementById('display-name').value;
+            const meetingNumber = document.getElementById('meeting-number').value;
+            const meetingPassword = document.getElementById('meeting-password').value;
+            
+            if (!displayName || !meetingNumber) {
+                alert('Please enter your name and meeting number');
+                return;
+            }
+            
+            // Save settings
+            localStorage.setItem('celera_display_name', displayName);
+            localStorage.setItem('celera_meeting_number', meetingNumber);
+            localStorage.setItem('celera_meeting_password', meetingPassword);
+            
+            try {
+                // Get signature from auth endpoint
+                const authEndpoint = "http://127.0.0.1:4000";
+                const response = await fetch(authEndpoint, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        meetingNumber: meetingNumber,
+                        role: 0, // Attendee
+                    }),
+                });
+                
+                const data = await response.json();
+                const signature = data.signature;
+                const sdkKey = data.sdkKey;
+                
+                // Build meeting config
+                const testTool = window.testTool;
+                const meetingConfig = {
+                    mn: meetingNumber,
+                    name: testTool.b64EncodeUnicode(displayName),
+                    pwd: meetingPassword,
+                    role: 0,
+                    email: "",
+                    lang: "en-US",
+                    signature: signature,
+                    sdkKey: sdkKey,
+                    china: 0,
+                };
+                
+                // Navigate to meeting page
+                const meetingUrl = "/meeting.html?" + testTool.serialize(meetingConfig);
+                window.location.href = meetingUrl;
+                
+            } catch (error) {
+                console.error("Failed to join meeting:", error);
+                alert("Failed to authenticate. Please check your meeting credentials.");
+            }
+        });
+    </script>
+</body>
+</html>
+

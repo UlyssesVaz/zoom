@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Celera - Deals Pipeline</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="../css/celera.css">
+    <style>
+        /* Summary Metrics Row */
+        .pipeline-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        .summary-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .summary-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        .summary-count {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .summary-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .summary-trend.up {
+            color: var(--success-color);
+        }
+        .summary-trend.down {
+            color: var(--error-color);
+        }
+
+        /* Context Bar - Simplified */
+        .pipeline-context {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .context-breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        .context-breadcrumb a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        .context-filter {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .context-filter:hover {
+            border-color: var(--accent-color);
+        }
+
+        /* Deals Table */
+        .deals-table-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .deals-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .deals-table thead {
+            background: var(--content-bg);
+            border-bottom: 2px solid var(--border-color);
+        }
+        .deals-table th {
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .deals-table th:first-child {
+            padding-left: 1.5rem;
+        }
+        .deals-table th:last-child {
+            padding-right: 1.5rem;
+        }
+        .deals-table tbody tr {
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .deals-table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.03);
+        }
+        .deals-table tbody tr:last-child {
+            border-bottom: none;
+        }
+        .deals-table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        .deals-table td:first-child {
+            padding-left: 1.5rem;
+        }
+        .deals-table td:last-child {
+            padding-right: 1.5rem;
+        }
+
+        /* Deal Name Column */
+        .deal-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .deal-expand-icon {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            transition: transform 0.2s;
+        }
+        .deal-expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+        .deal-name-content {
+            flex: 1;
+        }
+        .deal-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        .deal-version {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .deal-add-icon {
+            opacity: 0;
+            transition: opacity 0.2s;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .deals-table tbody tr:hover .deal-add-icon {
+            opacity: 1;
+        }
+
+        /* Score Column */
+        .deal-score {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 50px;
+            text-align: center;
+        }
+        .deal-score.high {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success-color);
+        }
+        .deal-score.medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning-color);
+        }
+        .deal-score.low {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error-color);
+        }
+        .deal-score-trend {
+            margin-left: 0.25rem;
+            font-size: 0.7rem;
+        }
+
+        /* Warnings Column */
+        .deal-warnings {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .warning-badge {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Contacts Column */
+        .deal-contacts {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Activity Timeline */
+        .deal-activity {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .activity-timeline {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-color);
+        }
+        .activity-dot.active {
+            background: var(--accent-color);
+        }
+        .activity-dot.recent {
+            background: #ec4899;
+        }
+        .activity-dates {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Stage Indicators */
+        .deal-stages {
+            display: flex;
+            gap: 0.25rem;
+        }
+        .stage-indicator {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: white;
+        }
+        .stage-indicator.active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Next Call Column */
+        .deal-next-call {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .deal-next-call.soon {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* Search Bar */
+        .pipeline-search {
+            margin-bottom: 1.5rem;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Deal Detail Sidebar Overlay */
+        .deal-sidebar-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 100vh;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 2000;
+            transition: width 0.3s ease;
+            overflow: hidden;
+        }
+        .deal-sidebar-overlay.open {
+            width: 500px;
+        }
+        .deal-sidebar-content {
+            width: 500px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .deal-sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            flex-shrink: 0;
+        }
+        .deal-sidebar-title {
+            flex: 1;
+        }
+        .deal-sidebar-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        .deal-sidebar-version {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .deal-sidebar-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .deal-sidebar-btn {
+            padding: 0.5rem 1rem;
+            background: var(--content-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .deal-sidebar-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+        .deal-sidebar-close {
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+        .deal-sidebar-close:hover {
+            color: var(--text-primary);
+        }
+        .deal-sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            overflow-x: auto;
+            background: var(--content-bg);
+            padding: 0 0.5rem;
+        }
+        .deal-sidebar-tab {
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            white-space: nowrap;
+            position: relative;
+            font-weight: 500;
+        }
+        .deal-sidebar-tab:hover {
+            color: var(--text-primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .deal-sidebar-tab.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+            font-weight: 600;
+            background: transparent;
+        }
+        .deal-sidebar-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: white;
+        }
+        .deal-sidebar-body {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+        .deal-sidebar-tab-content {
+            display: none;
+        }
+        .deal-sidebar-tab-content.active {
+            display: block;
+        }
+        .deal-sidebar-section {
+            margin-bottom: 2rem;
+        }
+        .deal-sidebar-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .deal-sidebar-link {
+            display: inline-block;
+            padding: 0.75rem 1rem;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.2s;
+        }
+        .deal-sidebar-link:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+        .activity-item {
+            padding: 1rem;
+            background: var(--content-bg);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--accent-color);
+        }
+        .activity-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+        .activity-item-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .activity-item-time {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        .activity-item-summary {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .contact-item-sidebar {
+            padding: 1rem;
+            background: var(--content-bg);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .contact-item-sidebar-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        .contact-item-sidebar-role {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        @media (max-width: 768px) {
+            .deal-sidebar-overlay.open {
+                width: 100%;
+            }
+            .deal-sidebar-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>🎯 Celera</h1>
+            <p>Sales Intelligence Platform</p>
+        </div>
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="/dashboard.html" class="sidebar-nav-link">
+                        <i>📊</i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/sales/pipeline.html" class="sidebar-nav-link active">
+                        <i>💼</i>
+                        <span>Deals</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/social-graph.html" class="sidebar-nav-link">
+                        <i>🕸️</i>
+                        <span>Social Graph</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/calendar.html" class="sidebar-nav-link">
+                        <i>📅</i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header disabled">
+                            <div class="sidebar-nav-group-title">
+                                <i>📈</i>
+                                <span>Marketing</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📢</i>
+                                    <span>Campaigns</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📊</i>
+                                    <span>Ads Performance</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>🔗</i>
+                                    <span>Lead Sources</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header">
+                            <div class="sidebar-nav-group-title">
+                                <i>🤖</i>
+                                <span>AI Tools</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/roleplay.html" class="sidebar-nav-submenu-link">
+                                    <i>🎭</i>
+                                    <span>Roleplay Practice</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/prep.html" class="sidebar-nav-submenu-link">
+                                    <i>💡</i>
+                                    <span>Call Prep AI</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/analysis.html" class="sidebar-nav-submenu-link">
+                                    <i>🔍</i>
+                                    <span>Conversation Analysis</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/settings.html" class="sidebar-nav-link">
+                        <i>⚙️</i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle">☰</button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Deals Pipeline</h1>
+        </div>
+
+        <!-- Summary Metrics -->
+        <div class="pipeline-summary" id="pipeline-summary">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Context Bar -->
+        <div class="pipeline-context">
+            <div class="context-breadcrumb">
+                <a href="#">← Your Team</a>
+            </div>
+            <select class="context-filter" id="timeframe-filter">
+                <option>Closing this quarter</option>
+                <option>Closing next quarter</option>
+                <option>All time</option>
+            </select>
+        </div>
+
+        <!-- Search -->
+        <div class="pipeline-search">
+            <input type="text" class="search-input" id="deal-search" placeholder="Search account, people, deals...">
+        </div>
+
+        <!-- Deals Table -->
+        <div class="deals-table-container">
+            <table class="deals-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Score</th>
+                        <th>Warnings</th>
+                        <th>Contacts</th>
+                        <th>Activity</th>
+                        <th>Stage</th>
+                        <th>Next Call</th>
+                    </tr>
+                </thead>
+                <tbody id="deals-table-body">
+                    <!-- Will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Deal Detail Sidebar Overlay -->
+    <div class="deal-sidebar-overlay" id="deal-sidebar">
+        <div class="deal-sidebar-content">
+            <div class="deal-sidebar-header">
+                <div class="deal-sidebar-title">
+                    <div class="deal-sidebar-name" id="sidebar-deal-name">-</div>
+                    <div class="deal-sidebar-version" id="sidebar-deal-version">-</div>
+                </div>
+                <div class="deal-sidebar-actions">
+                    <button class="deal-sidebar-btn" onclick="openInCRM()">Open in CRM</button>
+                    <button class="deal-sidebar-btn" onclick="joinZoomCall()" style="background: var(--success-color); color: white; border-color: var(--success-color);">Join Zoom Call</button>
+                    <button class="deal-sidebar-close" onclick="closeDealSidebar()">×</button>
+                </div>
+            </div>
+            <div class="deal-sidebar-tabs">
+                <button class="deal-sidebar-tab active" data-tab="contacts" onclick="switchTab('contacts')">Contacts</button>
+                <button class="deal-sidebar-tab" data-tab="review" onclick="switchTab('review')">Review Account</button>
+                <button class="deal-sidebar-tab" data-tab="score" onclick="switchTab('score')">Score</button>
+                <button class="deal-sidebar-tab" data-tab="warnings" onclick="switchTab('warnings')">Warnings</button>
+                <button class="deal-sidebar-tab" data-tab="activity" onclick="switchTab('activity')">Activity</button>
+            </div>
+            <div class="deal-sidebar-body">
+                <!-- Contacts Tab (Default/Active) -->
+                <div class="deal-sidebar-tab-content active" id="tab-contacts">
+                    <!-- Deal Context Section -->
+                    <div class="deal-sidebar-section">
+                        <div class="deal-sidebar-section-title">Deal Context</div>
+                        <div id="sidebar-deal-context">Loading...</div>
+                    </div>
+                    <!-- Key Contacts Section -->
+                    <div class="deal-sidebar-section">
+                        <div class="deal-sidebar-section-title">Key Contacts</div>
+                        <div id="sidebar-contacts-content">Loading...</div>
+                        <a href="/social-graph.html" class="deal-sidebar-link" style="margin-top: 1rem;">
+                            <i>🕸️</i> View Social Graph →
+                        </a>
+                    </div>
+                </div>
+                <!-- Review Account Tab -->
+                <div class="deal-sidebar-tab-content" id="tab-review">
+                    <div class="deal-sidebar-section">
+                        <div class="deal-sidebar-section-title">Account Information</div>
+                        <div id="sidebar-review-account-content">Loading...</div>
+                    </div>
+                </div>
+                <!-- Score Tab -->
+                <div class="deal-sidebar-tab-content" id="tab-score">
+                    <div class="deal-sidebar-section">
+                        <div class="deal-sidebar-section-title">Deal Score</div>
+                        <div id="sidebar-score-content">Loading...</div>
+                    </div>
+                </div>
+                <!-- Warnings Tab -->
+                <div class="deal-sidebar-tab-content" id="tab-warnings">
+                    <div class="deal-sidebar-section">
+                        <div class="deal-sidebar-section-title">Warnings & Alerts</div>
+                        <div id="sidebar-warnings-content">Loading...</div>
+                    </div>
+                </div>
+                <!-- Activity Tab -->
+                <div class="deal-sidebar-tab-content" id="tab-activity">
+                    <div class="deal-sidebar-section">
+                        <div class="deal-sidebar-section-title">Activity Log</div>
+                        <div id="sidebar-activity-content">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/tool.js"></script>
+    <script src="../js/hubspot-service.js"></script>
+    <script src="../js/linkedin-service.js"></script>
+    <script src="../js/data-service.js"></script>
+    <script src="../js/navigation.js"></script>
+    <script src="../js/pipeline.js"></script>
+</body>
+</html>
+

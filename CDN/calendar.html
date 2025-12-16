@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Celera - Calendar</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/celera.css">
+    <style>
+        /* Calendar View Styles */
+        .calendar-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--content-bg);
+        }
+
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .calendar-nav-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .calendar-nav-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .calendar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .calendar-view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--content-bg);
+            border-radius: 6px;
+            padding: 0.25rem;
+        }
+
+        .view-toggle-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .view-toggle-btn.active {
+            background: white;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* Calendar Grid */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--border-color);
+        }
+
+        .calendar-day-header {
+            background: var(--content-bg);
+            padding: 0.75rem;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .calendar-day {
+            background: white;
+            min-height: 120px;
+            padding: 0.5rem;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .calendar-day:hover {
+            background: var(--content-bg);
+        }
+
+        .calendar-day.other-month {
+            background: var(--content-bg);
+            opacity: 0.5;
+        }
+
+        .calendar-day.today {
+            background: rgba(102, 126, 234, 0.05);
+            border: 2px solid var(--accent-color);
+        }
+
+        .day-number {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day.today .day-number {
+            color: var(--accent-color);
+        }
+
+        .day-events {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .day-event {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .day-event.has-zoom {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .day-event.has-deal {
+            background: rgba(102, 126, 234, 0.15);
+            color: var(--accent-color);
+        }
+
+        .day-event:hover {
+            transform: translateX(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* List View */
+        .calendar-list {
+            display: none;
+        }
+
+        .calendar-list.active {
+            display: block;
+        }
+
+        .event-list-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .event-list-item:hover {
+            background: var(--content-bg);
+        }
+
+        .event-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .event-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .event-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .event-details {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .event-action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .event-action-btn.join {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .event-action-btn.join:hover {
+            background: #059669;
+        }
+
+        .event-action-btn.view-deal {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .event-action-btn.view-deal:hover {
+            background: #5568d3;
+        }
+
+        /* Empty State */
+        .calendar-empty {
+            padding: 4rem 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .calendar-empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Connect Prompt */
+        .calendar-connect-prompt {
+            padding: 2rem;
+            text-align: center;
+            background: var(--content-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .calendar-connect-prompt-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-connect-prompt-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-connect-prompt-text {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>🎯 Celera</h1>
+            <p>Sales Intelligence Platform</p>
+        </div>
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="/dashboard.html" class="sidebar-nav-link">
+                        <i>📊</i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/sales/pipeline.html" class="sidebar-nav-link">
+                        <i>💼</i>
+                        <span>Deals</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/social-graph.html" class="sidebar-nav-link">
+                        <i>🕸️</i>
+                        <span>Social Graph</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/calendar.html" class="sidebar-nav-link active">
+                        <i>📅</i>
+                        <span>Calendar</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header">
+                            <div class="sidebar-nav-group-title">
+                                <i>🤖</i>
+                                <span>AI Tools</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/roleplay.html" class="sidebar-nav-submenu-link">
+                                    <i>🎭</i>
+                                    <span>Roleplay Practice</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/prep.html" class="sidebar-nav-submenu-link">
+                                    <i>💡</i>
+                                    <span>Call Prep AI</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/analysis.html" class="sidebar-nav-submenu-link">
+                                    <i>🔍</i>
+                                    <span>Conversation Analysis</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/settings.html" class="sidebar-nav-link">
+                        <i>⚙️</i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle">☰</button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Calendar</h1>
+            <p>View and join your upcoming meetings</p>
+        </div>
+
+        <!-- Connect Prompt (shown when not connected) -->
+        <div id="calendar-connect-prompt" class="calendar-connect-prompt" style="display: none;">
+            <div class="calendar-connect-prompt-icon">📅</div>
+            <div class="calendar-connect-prompt-title">Connect Your Google Calendar</div>
+            <div class="calendar-connect-prompt-text">
+                Connect your Google Calendar to see upcoming meetings and join Zoom calls directly from your calendar.
+            </div>
+            <button class="btn btn-primary" onclick="connectGoogleCalendar()">
+                Connect Google Calendar
+            </button>
+        </div>
+
+        <!-- Calendar Container -->
+        <div id="calendar-container" class="calendar-container" style="display: none;">
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button class="calendar-nav-btn" onclick="previousMonth()">← Previous</button>
+                    <div class="calendar-title" id="calendar-title">January 2024</div>
+                    <button class="calendar-nav-btn" onclick="nextMonth()">Next →</button>
+                </div>
+                <div class="calendar-view-toggle">
+                    <button class="view-toggle-btn active" data-view="month" onclick="switchView('month')">Month</button>
+                    <button class="view-toggle-btn" data-view="list" onclick="switchView('list')">List</button>
+                </div>
+            </div>
+
+            <!-- Month View -->
+            <div id="calendar-month-view" class="calendar-grid">
+                <!-- Will be populated by JavaScript -->
+            </div>
+
+            <!-- List View -->
+            <div id="calendar-list-view" class="calendar-list">
+                <div id="calendar-list-content">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/tool.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/google-service.js"></script>
+    <script src="js/google-calendar-service.js"></script>
+    <script src="js/calendar.js"></script>
+</body>
+</html>
+

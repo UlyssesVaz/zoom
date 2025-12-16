@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Celera - Webhook Receiver</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        .webhook-card {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="webhook-card">
+        <h1>Webhook Receiver</h1>
+        <p>This page receives webhook events from Zoom and updates the call summary.</p>
+        <div id="status"></div>
+        <pre id="webhook-data"></pre>
+    </div>
+
+    <script>
+        // Parse webhook data from URL or POST data
+        const urlParams = new URLSearchParams(window.location.search);
+        const webhookDataParam = urlParams.get('data');
+        
+        let webhookData = null;
+        
+        if (webhookDataParam) {
+            try {
+                webhookData = JSON.parse(decodeURIComponent(webhookDataParam));
+            } catch (e) {
+                console.error("Failed to parse webhook data", e);
+            }
+        }
+        
+        // Display webhook data
+        const dataEl = document.getElementById("webhook-data");
+        const statusEl = document.getElementById("status");
+        
+        if (webhookData) {
+            dataEl.textContent = JSON.stringify(webhookData, null, 2);
+            
+            // Store webhook data in sessionStorage for summary page
+            sessionStorage.setItem("celera_webhook_data", JSON.stringify(webhookData));
+            
+            statusEl.className = "status success";
+            statusEl.textContent = "✅ Webhook data received and stored!";
+            
+            // Redirect to summary page after 2 seconds
+            setTimeout(() => {
+                window.location.href = "/summary.html?webhook_data=" + encodeURIComponent(JSON.stringify(webhookData));
+            }, 2000);
+        } else {
+            statusEl.className = "status error";
+            statusEl.textContent = "❌ No webhook data received";
+            dataEl.textContent = "Waiting for webhook data...";
+        }
+        
+        // Also listen for POST requests (if this page receives POST data)
+        // Note: In production, you'd use a proper backend endpoint
+        window.addEventListener("message", function(event) {
+            if (event.data && event.data.type === "webhook") {
+                const data = event.data.payload;
+                sessionStorage.setItem("celera_webhook_data", JSON.stringify(data));
+                window.location.href = "/summary.html?webhook_data=" + encodeURIComponent(JSON.stringify(data));
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+

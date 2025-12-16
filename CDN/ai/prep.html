@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Celera - Call Prep AI</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="../css/celera.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>🎯 Celera</h1>
+            <p>Sales Intelligence Platform</p>
+        </div>
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="/dashboard.html" class="sidebar-nav-link">
+                        <i>📊</i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/sales/pipeline.html" class="sidebar-nav-link">
+                        <i>💼</i>
+                        <span>Deals</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header disabled">
+                            <div class="sidebar-nav-group-title">
+                                <i>📈</i>
+                                <span>Marketing</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📢</i>
+                                    <span>Campaigns</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📊</i>
+                                    <span>Ads Performance</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>🔗</i>
+                                    <span>Lead Sources</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header expanded active">
+                            <div class="sidebar-nav-group-title">
+                                <i>🤖</i>
+                                <span>AI Tools</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/roleplay.html" class="sidebar-nav-submenu-link">
+                                    <i>🎭</i>
+                                    <span>Roleplay Practice</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/prep.html" class="sidebar-nav-submenu-link active">
+                                    <i>💡</i>
+                                    <span>Call Prep AI</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/analysis.html" class="sidebar-nav-submenu-link">
+                                    <i>🔍</i>
+                                    <span>Conversation Analysis</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/settings.html" class="sidebar-nav-link">
+                        <i>⚙️</i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle">☰</button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Call Prep AI</h1>
+            <p>Get AI-powered insights and practice scenarios for your upcoming calls</p>
+        </div>
+
+        <!-- Configuration Check -->
+        <div id="config-check" class="card" style="display: none; margin-bottom: 1.5rem;">
+            <div style="padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--error-color); border-radius: 8px;">
+                <strong style="color: var(--error-color);">Yoodli API Not Configured</strong>
+                <p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);">
+                    Please configure your Yoodli API credentials in <a href="/settings.html" style="color: var(--accent-color);">Settings</a> to use Call Prep AI.
+                </p>
+            </div>
+        </div>
+
+        <!-- Deal Context Card -->
+        <div class="card" id="deal-context-card" style="display: none;">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i>💼</i>
+                    <span>Deal Context</span>
+                </h2>
+            </div>
+            <div id="deal-context-content">
+                <!-- Deal context will be loaded here -->
+            </div>
+        </div>
+
+        <!-- AI Prep Options -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i>🤖</i>
+                    <span>AI-Powered Preparation</span>
+                </h2>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                <div class="action-item" style="cursor: pointer;" onclick="startContextualPractice()">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎭</div>
+                    <strong>Practice Roleplay</strong>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                        Practice this specific call scenario with AI
+                    </p>
+                </div>
+                <div class="action-item" style="cursor: pointer;" onclick="generateTalkingPoints()">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">💡</div>
+                    <strong>Generate Talking Points</strong>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                        Get AI-generated talking points for this call
+                    </p>
+                </div>
+                <div class="action-item" style="cursor: pointer;" onclick="analyzeDeal()">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔍</div>
+                    <strong>Analyze Deal</strong>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                        Get insights and recommendations
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../js/tool.js"></script>
+    <script src="../js/data-service.js"></script>
+    <script src="../js/yoodli-service.js"></script>
+    <script src="../js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check if Yoodli is configured
+            if (!window.yoodliService.isConfigured()) {
+                document.getElementById('config-check').style.display = 'block';
+                return;
+            }
+
+            // Load deal context if available
+            const crmContextStr = sessionStorage.getItem('celera_crm_context');
+            if (crmContextStr) {
+                try {
+                    const context = JSON.parse(crmContextStr);
+                    displayDealContext(context);
+                } catch (e) {
+                    console.error('Failed to parse CRM context:', e);
+                }
+            }
+        });
+
+        function displayDealContext(context) {
+            const card = document.getElementById('deal-context-card');
+            const content = document.getElementById('deal-context-content');
+            
+            content.innerHTML = `
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Account</div>
+                        <div class="info-value">${context.accountName || '-'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Deal</div>
+                        <div class="info-value">${context.dealName || '-'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Value</div>
+                        <div class="info-value">${context.dealValue || '-'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Stage</div>
+                        <div class="info-value">${context.dealStage || '-'}</div>
+                    </div>
+                </div>
+            `;
+            
+            card.style.display = 'block';
+        }
+
+        async function startContextualPractice() {
+            const crmContextStr = sessionStorage.getItem('celera_crm_context');
+            if (!crmContextStr) {
+                alert('No deal context available. Please select a deal from the pipeline first.');
+                window.location.href = '/sales/pipeline.html';
+                return;
+            }
+
+            try {
+                const context = JSON.parse(crmContextStr);
+                const session = await window.yoodliService.createContextualRoleplay(context);
+                window.location.href = `/ai/roleplay.html?sessionId=${session.id}&contextual=true`;
+            } catch (error) {
+                console.error('Failed to start practice:', error);
+                alert('Failed to start AI practice. Please try again.');
+            }
+        }
+
+        function generateTalkingPoints() {
+            alert('Talking points generation coming soon!');
+        }
+
+        function analyzeDeal() {
+            alert('Deal analysis coming soon!');
+        }
+    </script>
+</body>
+</html>

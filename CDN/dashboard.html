@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Celera - Dashboard</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/celera.css">
+    <style>
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .metric-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .quick-action-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quick-action-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            border-color: var(--accent-color);
+        }
+        .quick-action-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        .quick-action-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .quick-action-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>🎯 Celera</h1>
+            <p>Sales Intelligence Platform</p>
+        </div>
+        <nav>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="/dashboard.html" class="sidebar-nav-link active">
+                        <i>📊</i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/sales/pipeline.html" class="sidebar-nav-link">
+                        <i>💼</i>
+                        <span>Deals</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/social-graph.html" class="sidebar-nav-link">
+                        <i>🕸️</i>
+                        <span>Social Graph</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header disabled">
+                            <div class="sidebar-nav-group-title">
+                                <i>📈</i>
+                                <span>Marketing</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📢</i>
+                                    <span>Campaigns</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>📊</i>
+                                    <span>Ads Performance</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="#" class="sidebar-nav-submenu-link disabled">
+                                    <i>🔗</i>
+                                    <span>Lead Sources</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <div class="sidebar-nav-group">
+                        <div class="sidebar-nav-group-header">
+                            <div class="sidebar-nav-group-title">
+                                <i>🤖</i>
+                                <span>AI Tools</span>
+                            </div>
+                            <span class="sidebar-nav-group-icon">▶</span>
+                        </div>
+                        <ul class="sidebar-nav-submenu">
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/roleplay.html" class="sidebar-nav-submenu-link">
+                                    <i>🎭</i>
+                                    <span>Roleplay Practice</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/prep.html" class="sidebar-nav-submenu-link">
+                                    <i>💡</i>
+                                    <span>Call Prep AI</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-nav-submenu-item">
+                                <a href="/ai/analysis.html" class="sidebar-nav-submenu-link">
+                                    <i>🔍</i>
+                                    <span>Conversation Analysis</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/settings.html" class="sidebar-nav-link">
+                        <i>⚙️</i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle">☰</button>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Dashboard</h1>
+            <p>Overview of your sales performance and activities</p>
+        </div>
+
+        <div class="metrics-grid" id="metrics-grid">
+            <!-- Metrics will be loaded by JavaScript -->
+        </div>
+
+        <div class="quick-actions">
+            <div class="quick-action-card" onclick="window.location.href='/sales/pipeline.html'">
+                <div class="quick-action-icon">📋</div>
+                <div class="quick-action-title">View Pipeline</div>
+                <div class="quick-action-desc">Manage your leads and deals</div>
+            </div>
+            <div class="quick-action-card" onclick="window.location.href='/ai/roleplay.html'">
+                <div class="quick-action-icon">🎭</div>
+                <div class="quick-action-title">Practice Roleplay</div>
+                <div class="quick-action-desc">AI-powered conversation practice</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/tool.js"></script>
+    <script src="js/hubspot-service.js"></script>
+    <script src="js/linkedin-service.js"></script>
+    <script src="js/data-service.js"></script>
+    <script src="js/navigation.js"></script>
+    <script>
+        // Load dashboard metrics
+        async function loadDashboard() {
+            try {
+                const metrics = await window.dataService.getDashboardMetrics();
+                const metricsGrid = document.getElementById('metrics-grid');
+                
+                metricsGrid.innerHTML = `
+                    <div class="metric-card">
+                        <div class="metric-value">${metrics.totalLeads}</div>
+                        <div class="metric-label">Total Leads</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${metrics.activeDeals}</div>
+                        <div class="metric-label">Active Deals</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$${(metrics.totalValue / 1000).toFixed(0)}K</div>
+                        <div class="metric-label">Pipeline Value</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${metrics.callsThisWeek}</div>
+                        <div class="metric-label">Calls This Week</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">${metrics.conversionRate}%</div>
+                        <div class="metric-label">Conversion Rate</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">$${(metrics.avgDealSize / 1000).toFixed(0)}K</div>
+                        <div class="metric-label">Avg Deal Size</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>
+
