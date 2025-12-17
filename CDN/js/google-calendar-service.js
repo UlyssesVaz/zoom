@@ -187,41 +187,66 @@ class GoogleCalendarService {
   }
 
   /**
-   * Extract Zoom meeting info from event
+   * Extract meeting info from event (Zoom or Google Meet)
    * @param {Object} event - Calendar event
-   * @returns {Object|null} Zoom meeting info or null
+   * @returns {Object|null} Meeting info or null
    */
-  extractZoomMeeting(event) {
+  extractMeetingInfo(event) {
     const description = event.description || '';
     const location = event.location || '';
     const hangoutLink = event.hangoutLink || '';
     
-    // Look for Zoom links
+    // Check for Google Meet first (hangoutLink is reliable indicator)
+    if (hangoutLink && hangoutLink.includes('meet.google.com')) {
+      const meetCode = hangoutLink.match(/meet\.google\.com\/([a-z-]+)/i);
+      if (meetCode) {
+        return {
+          platform: 'google-meet',
+          meetingCode: meetCode[1],
+          joinUrl: hangoutLink
+        };
+      }
+    }
+    
+    // Check for Zoom links
     const zoomPattern = /(?:zoom\.us\/j\/|zoom\.us\/join\/|zoom\.us\/meeting\/)([0-9]{9,11})/gi;
     const zoomPasswordPattern = /(?:pwd|password)[\s:=]+([a-zA-Z0-9]{6,})/gi;
     
-    let meetingNumber = null;
-    let password = null;
-    
-    // Check description and location
-    const textToSearch = `${description} ${location} ${hangoutLink}`;
+    const textToSearch = `${description} ${location}`;
     const zoomMatch = zoomPattern.exec(textToSearch);
+    
     if (zoomMatch) {
-      meetingNumber = zoomMatch[1];
+      let password = null;
       const pwdMatch = zoomPasswordPattern.exec(textToSearch);
       if (pwdMatch) {
         password = pwdMatch[1];
       }
-    }
-    
-    if (meetingNumber) {
+      
       return {
-        meetingNumber,
-        password,
-        joinUrl: `https://zoom.us/j/${meetingNumber}${password ? `?pwd=${password}` : ''}`
+        platform: 'zoom',
+        meetingNumber: zoomMatch[1],
+        password: password,
+        joinUrl: `https://zoom.us/j/${zoomMatch[1]}${password ? `?pwd=${password}` : ''}`
       };
     }
     
+    return null;
+  }
+
+  /**
+   * Extract Zoom meeting info from event (deprecated - use extractMeetingInfo)
+   * @param {Object} event - Calendar event
+   * @returns {Object|null} Zoom meeting info or null
+   */
+  extractZoomMeeting(event) {
+    const meetingInfo = this.extractMeetingInfo(event);
+    if (meetingInfo && meetingInfo.platform === 'zoom') {
+      return {
+        meetingNumber: meetingInfo.meetingNumber,
+        password: meetingInfo.password,
+        joinUrl: meetingInfo.joinUrl
+      };
+    }
     return null;
   }
 
@@ -279,7 +304,8 @@ class GoogleCalendarService {
         name: event.organizer.displayName || event.organizer.email
       } : null,
       hangoutLink: event.hangoutLink || null,
-      zoomMeeting: this.extractZoomMeeting(event),
+      meetingInfo: this.extractMeetingInfo(event),
+      zoomMeeting: this.extractZoomMeeting(event), // Keep for backward compatibility
       dealId: event.extendedProperties?.private?.dealId || null,
       metadata: {
         googleEventId: event.id,

@@ -1,0 +1,58 @@
+services:
+  # Main application server
+  celera-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celera-app
+    ports:
+      - "9999:9999"
+      - "4001:4001"
+    environment:
+      - NODE_ENV=production
+      - PORT=9999
+      - WEBHOOK_PORT=4001
+    volumes:
+      # Mount for persistent data (webhook events, etc.)
+      - celera-data:/app/data
+    networks:
+      - celera-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:9999/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Auth endpoint service
+  celera-auth:
+    build:
+      context: ./meetingsdk-auth-endpoint-sample
+      dockerfile: Dockerfile.auth
+    container_name: celera-auth
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - ZOOM_MEETING_SDK_KEY=${ZOOM_MEETING_SDK_KEY:-}
+      - ZOOM_MEETING_SDK_SECRET=${ZOOM_MEETING_SDK_SECRET:-}
+      - CLIENT_SECRET=${CLIENT_SECRET:-}
+    networks:
+      - celera-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:4000/', (r) => {process.exit(r.statusCode === 200 || r.statusCode === 404 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  celera-data:
+    driver: local
+
+networks:
+  celera-network:
+    driver: bridge
+

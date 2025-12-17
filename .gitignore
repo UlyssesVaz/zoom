@@ -12,3 +12,8 @@ export.sh
 /Components/node_modules
 /Components/yarn.lock
 CLAUDE.md
+
+# Environment files - DO NOT commit secrets!
+.env
+.env.local
+.env.*.local

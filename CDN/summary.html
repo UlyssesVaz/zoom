@@ -147,6 +147,121 @@
             color: var(--accent-color);
             font-weight: 600;
         }
+        /* Meeting Tasks Styles */
+        .meeting-task-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--content-bg);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+        .meeting-task-item:hover {
+            border-color: var(--accent-color);
+        }
+        .meeting-task-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .meeting-task-checkbox:hover {
+            border-color: var(--accent-color);
+        }
+        .meeting-task-checkbox.checked {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+        .meeting-task-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .meeting-task-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .meeting-task-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+            word-wrap: break-word;
+        }
+        .meeting-task-item.completed .meeting-task-title {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        .meeting-task-title input {
+            width: 100%;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .meeting-task-title input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        .meeting-task-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .meeting-task-action-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .meeting-task-action-btn.email {
+            background: var(--accent-color);
+            color: white;
+        }
+        .meeting-task-action-btn.email:hover {
+            background: #5568d3;
+        }
+        .meeting-task-action-btn.schedule {
+            background: var(--success-color);
+            color: white;
+        }
+        .meeting-task-action-btn.schedule:hover {
+            background: #1a8a3e;
+        }
+        .meeting-task-action-btn.edit {
+            background: var(--content-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        .meeting-task-action-btn.edit:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        .task-email-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--accent-color);
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
         /* Hide sidebar on debrief page */
         .sidebar {
             display: none;
@@ -165,18 +280,18 @@
             <button class="debrief-save-btn" onclick="saveDebrief()">Save</button>
         </div>
 
-        <!-- Next Steps Section (First) -->
+        <!-- Meeting Tasks Section (First) -->
         <div class="card debrief-section">
             <div class="debrief-section-title">
-                <i>✅</i>
-                <span>Next Steps</span>
+                <i>📋</i>
+                <span>Tasks from This Meeting</span>
+                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: normal; margin-left: auto;">
+                    These will be added to your <a href="/todo.html" style="color: var(--accent-color);">Tasks page</a>
+                </span>
             </div>
-            <ul class="next-steps-list" id="next-steps-list">
+            <div id="meeting-tasks-list">
                 <!-- Will be populated by JavaScript -->
-            </ul>
-            <button class="add-next-step-btn" onclick="addNextStep()">
-                + Add Next Step
-            </button>
+            </div>
         </div>
 
         <!-- Debrief Section (Second) -->
@@ -208,6 +323,8 @@
     <script src="js/tool.js"></script>
     <script src="js/data-service.js"></script>
     <script src="js/graph-service.js"></script>
+    <script src="js/todo-service.js"></script>
+    <script src="js/email-service.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/summary.js"></script>
 </body>

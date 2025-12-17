@@ -62,6 +62,215 @@
             font-size: 0.9rem;
             color: var(--text-secondary);
         }
+        
+        /* Sales Orchestrator Styles */
+        .orchestrator-section {
+            margin-bottom: 2rem;
+        }
+        .orchestrator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .orchestrator-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .orchestrator-refresh {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .orchestrator-refresh:hover {
+            background: #5568d3;
+        }
+        .orchestrator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .orchestrator-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+        }
+        .orchestrator-card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .orchestrator-card.hot .orchestrator-card-header {
+            color: #f59e0b;
+        }
+        .orchestrator-card.risk .orchestrator-card-header {
+            color: #ef4444;
+        }
+        .orchestrator-card.action .orchestrator-card-header {
+            color: var(--accent-color);
+        }
+        .orchestrator-item {
+            padding: 0.75rem;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .orchestrator-card.hot .orchestrator-item {
+            border-left-color: #f59e0b;
+        }
+        .orchestrator-card.risk .orchestrator-item {
+            border-left-color: #ef4444;
+        }
+        .orchestrator-card.action .orchestrator-item {
+            border-left-color: var(--accent-color);
+        }
+        .orchestrator-item:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .orchestrator-item-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+        .orchestrator-item-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        .orchestrator-item-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .orchestrator-btn {
+            padding: 0.4rem 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .orchestrator-btn-primary {
+            background: var(--accent-color);
+            color: white;
+        }
+        .orchestrator-btn-primary:hover {
+            background: #5568d3;
+        }
+        .orchestrator-btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        .orchestrator-btn-secondary:hover {
+            background: var(--card-bg);
+        }
+        .urgency-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+        }
+        .urgency-high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .urgency-medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .urgency-low {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .orchestrator-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Engagement Widget Styles */
+        .engagement-widget {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(102, 126, 234, 0.02) 100%);
+            border: 1px solid var(--accent-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .engagement-widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .engagement-widget-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .engagement-score {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+        .engagement-signals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .engagement-signal-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        .engagement-signal-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+        .engagement-signal-card.active {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+        }
+        .signal-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .signal-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+        .signal-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .signal-trend {
+            font-size: 0.75rem;
+            color: var(--success-color);
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -83,6 +292,12 @@
                     <a href="/sales/pipeline.html" class="sidebar-nav-link">
                         <i>💼</i>
                         <span>Deals</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="/todo.html" class="sidebar-nav-link">
+                        <i>✅</i>
+                        <span>Tasks</span>
                     </a>
                 </li>
                 <li class="sidebar-nav-item">
@@ -177,6 +392,17 @@
             <!-- Metrics will be loaded by JavaScript -->
         </div>
 
+        <!-- Sales Orchestrator -->
+        <div class="orchestrator-section">
+            <div class="orchestrator-header">
+                <div class="orchestrator-title">Sales Orchestrator</div>
+                <button class="orchestrator-refresh" onclick="loadOrchestrator()">🔄 Refresh</button>
+            </div>
+            <div class="orchestrator-grid" id="orchestrator-grid">
+                <div class="orchestrator-empty">Loading insights...</div>
+            </div>
+        </div>
+
         <div class="quick-actions">
             <div class="quick-action-card" onclick="window.location.href='/sales/pipeline.html'">
                 <div class="quick-action-icon">📋</div>
@@ -195,6 +421,9 @@
     <script src="js/hubspot-service.js"></script>
     <script src="js/linkedin-service.js"></script>
     <script src="js/data-service.js"></script>
+    <script src="js/sales-orchestrator-service.js"></script>
+    <script src="js/email-service.js"></script>
+    <script src="js/meeting-service.js"></script>
     <script src="js/navigation.js"></script>
     <script>
         // Load dashboard metrics
@@ -234,7 +463,281 @@
             }
         }
         
-        document.addEventListener('DOMContentLoaded', loadDashboard);
+        // Load Sales Orchestrator insights
+        async function loadOrchestrator() {
+            const grid = document.getElementById('orchestrator-grid');
+            grid.innerHTML = '<div class="orchestrator-empty">Analyzing deals...</div>';
+            
+            try {
+                const insights = await window.salesOrchestratorService.analyze();
+                
+                let html = '';
+                
+                // Hot Leads Card
+                html += `
+                    <div class="orchestrator-card hot">
+                        <div class="orchestrator-card-header">
+                            🔥 Hot Signals
+                        </div>
+                        ${insights.hot_leads.length > 0 ? insights.hot_leads.map(lead => {
+                            const urgencyClass = lead.urgency_score >= 7 ? 'urgency-high' : 
+                                               lead.urgency_score >= 4 ? 'urgency-medium' : 'urgency-low';
+                            return `
+                                <div class="orchestrator-item">
+                                    <div class="orchestrator-item-title">
+                                        ${lead.lead_name}
+                                        <span class="urgency-badge ${urgencyClass}">${lead.urgency_score}/10</span>
+                                    </div>
+                                    <div class="orchestrator-item-meta">${lead.signal_reason}</div>
+                                    <div class="orchestrator-item-actions">
+                                        <button class="orchestrator-btn orchestrator-btn-secondary" onclick="viewDeal('${lead.deal_id}')">
+                                            View Deal
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('') : '<div class="orchestrator-empty">No hot signals right now</div>'}
+                    </div>
+                `;
+                
+                // Risks Card
+                html += `
+                    <div class="orchestrator-card risk">
+                        <div class="orchestrator-card-header">
+                            ⚠️ Risk Signals
+                        </div>
+                        ${insights.risks.length > 0 ? insights.risks.map(risk => {
+                            // Deal name will be retrieved from the insights or we can fetch it
+                            // For now, we'll use a placeholder that will be filled by the orchestrator service
+                            const dealName = risk.deal_name || 'Unknown Deal';
+                            
+                            return `
+                                <div class="orchestrator-item">
+                                    <div class="orchestrator-item-title">${dealName}</div>
+                                    <div class="orchestrator-item-meta">${risk.issue}</div>
+                                    <div class="orchestrator-item-meta" style="font-weight: 600; color: var(--accent-color); margin-top: 0.25rem;">
+                                        💡 ${risk.suggested_fix}
+                                    </div>
+                                    <div class="orchestrator-item-actions">
+                                        <button class="orchestrator-btn orchestrator-btn-secondary" onclick="viewDeal('${risk.deal_id}')">
+                                            View Deal
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('') : '<div class="orchestrator-empty">No risks detected</div>'}
+                    </div>
+                `;
+                
+                // Smart Actions Card
+                html += `
+                    <div class="orchestrator-card action">
+                        <div class="orchestrator-card-header">
+                            ✅ Next Best Actions
+                        </div>
+                        ${insights.smart_actions.length > 0 ? insights.smart_actions.map((action, index) => {
+                            const actionIcon = action.action_type === 'EMAIL' ? '📧' : 
+                                             action.action_type === 'CALL' ? '📞' : 
+                                             action.action_type === 'LINKEDIN' ? '💼' : '✅';
+                            
+                            return `
+                                <div class="orchestrator-item">
+                                    <div class="orchestrator-item-title">
+                                        ${actionIcon} ${action.target_name}
+                                    </div>
+                                    <div class="orchestrator-item-meta">${action.rationale}</div>
+                                    ${action.draft_content ? `
+                                        <div class="orchestrator-item-meta" style="font-style: italic; margin-top: 0.5rem; padding: 0.5rem; background: var(--card-bg); border-radius: 4px;">
+                                            "${action.draft_content}"
+                                        </div>
+                                    ` : ''}
+                                    <div class="orchestrator-item-actions">
+                                        <button class="orchestrator-btn orchestrator-btn-primary" onclick="executeAction(${index})">
+                                            ${action.action_type === 'EMAIL' ? 'Send Email' : 
+                                              action.action_type === 'CALL' ? 'Schedule Call' : 
+                                              action.action_type === 'LINKEDIN' ? 'Open LinkedIn' : 'Execute'}
+                                        </button>
+                                        <button class="orchestrator-btn orchestrator-btn-secondary" onclick="dismissAction(${index})">
+                                            Dismiss
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('') : '<div class="orchestrator-empty">No actions needed right now</div>'}
+                    </div>
+                `;
+                
+                grid.innerHTML = html;
+                
+                // Store insights globally for action handlers
+                window.currentOrchestratorInsights = insights;
+            } catch (error) {
+                console.error('Failed to load orchestrator insights:', error);
+                grid.innerHTML = '<div class="orchestrator-empty">Failed to load insights. Please try again.</div>';
+            }
+        }
+        
+        // View deal in pipeline
+        function viewDeal(dealId) {
+            window.location.href = `/sales/pipeline.html?dealId=${dealId}`;
+        }
+        
+        // Execute action
+        async function executeAction(actionIndex) {
+            const insights = window.currentOrchestratorInsights;
+            if (!insights || !insights.smart_actions[actionIndex]) return;
+            
+            const action = insights.smart_actions[actionIndex];
+            
+            if (action.action_type === 'EMAIL') {
+                // Use email service to compose email
+                if (window.emailService) {
+                    const emailData = {
+                        to: action.target_name,
+                        subject: `Re: ${action.rationale}`,
+                        body: action.draft_content
+                    };
+                    // Get dealId from action if available
+                    const dealId = action.deal_id || null;
+                    const contactId = action.contact_id || null;
+                    await window.emailService.composeEmail(emailData, dealId, contactId);
+                } else {
+                    // Fallback to mailto
+                    const mailtoLink = `mailto:${action.target_name}?subject=${encodeURIComponent('Re: ' + action.rationale)}&body=${encodeURIComponent(action.draft_content)}`;
+                    window.open(mailtoLink);
+                }
+            } else if (action.action_type === 'CALL') {
+                // Open pipeline to schedule call or join meeting
+                const deals = await window.dataService.getPipeline();
+                const deal = deals.find(d => {
+                    const contacts = d.contacts || [];
+                    return contacts.some(c => {
+                        const contactName = typeof c === 'string' ? c : c.name;
+                        return contactName.includes(action.target_name.split(' ')[0]);
+                    });
+                });
+                
+                if (deal) {
+                    window.location.href = `/sales/pipeline.html?dealId=${deal.id}`;
+                } else {
+                    alert('Deal not found. Please schedule the call manually.');
+                }
+            } else if (action.action_type === 'LINKEDIN') {
+                // Open LinkedIn (would need LinkedIn service integration)
+                if (window.linkedinService) {
+                    // Try to get LinkedIn profile URL
+                    alert('LinkedIn integration coming soon. Please reach out manually.');
+                } else {
+                    window.open(`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(action.target_name)}`, '_blank');
+                }
+            }
+            
+            // Dismiss the action after execution
+            dismissAction(actionIndex);
+        }
+        
+        // Dismiss action
+        function dismissAction(actionIndex) {
+            const insights = window.currentOrchestratorInsights;
+            if (!insights) return;
+            
+            insights.smart_actions.splice(actionIndex, 1);
+            loadOrchestrator();
+        }
+        
+        // Load engagement signals
+        async function loadEngagementSignals() {
+            const widget = document.getElementById('engagement-widget');
+            const grid = document.getElementById('engagement-signals-grid');
+            const scoreEl = document.getElementById('engagement-score');
+            
+            if (!widget || !window.telemetryService) {
+                return;
+            }
+            
+            try {
+                // Get all deals
+                const deals = await window.dataService.getPipeline();
+                const activeDeals = deals.filter(d => d.stage !== 'closed');
+                
+                if (activeDeals.length === 0) {
+                    widget.style.display = 'none';
+                    return;
+                }
+                
+                // Calculate overall engagement
+                let totalScore = 0;
+                let dealCount = 0;
+                const recentSignals = {
+                    emails: { opened: 0, clicked: 0 },
+                    documents: { viewed: 0 },
+                    calendar: { accepted: 0 }
+                };
+                
+                activeDeals.forEach(deal => {
+                    const signals = window.telemetryService.getDealEngagementSignals(deal.id);
+                    if (signals.overall > 0) {
+                        totalScore += signals.overall;
+                        dealCount++;
+                    }
+                    
+                    const recent = window.telemetryService.getRecentEngagement(deal.id, 24);
+                    recentSignals.emails.opened += recent.emails.opened;
+                    recentSignals.emails.clicked += recent.emails.clicked;
+                    recentSignals.documents.viewed += recent.documents.viewed;
+                    recentSignals.calendar.accepted += recent.calendar.accepted;
+                });
+                
+                const avgScore = dealCount > 0 ? Math.round(totalScore / dealCount) : 0;
+                
+                // Show widget if there's any engagement
+                if (avgScore > 0 || recentSignals.emails.opened > 0 || recentSignals.documents.viewed > 0) {
+                    widget.style.display = 'block';
+                    scoreEl.textContent = avgScore;
+                    
+                    grid.innerHTML = `
+                        <div class="engagement-signal-card ${recentSignals.emails.opened > 0 ? 'active' : ''}">
+                            <div class="signal-icon">📧</div>
+                            <div class="signal-label">Emails Opened</div>
+                            <div class="signal-value">${recentSignals.emails.opened}</div>
+                            <div class="signal-trend">Last 24h</div>
+                        </div>
+                        <div class="engagement-signal-card ${recentSignals.emails.clicked > 0 ? 'active' : ''}">
+                            <div class="signal-icon">🔗</div>
+                            <div class="signal-label">Links Clicked</div>
+                            <div class="signal-value">${recentSignals.emails.clicked}</div>
+                            <div class="signal-trend">Last 24h</div>
+                        </div>
+                        <div class="engagement-signal-card ${recentSignals.documents.viewed > 0 ? 'active' : ''}">
+                            <div class="signal-icon">📄</div>
+                            <div class="signal-label">Docs Viewed</div>
+                            <div class="signal-value">${recentSignals.documents.viewed}</div>
+                            <div class="signal-trend">Last 24h</div>
+                        </div>
+                        <div class="engagement-signal-card ${recentSignals.calendar.accepted > 0 ? 'active' : ''}">
+                            <div class="signal-icon">✅</div>
+                            <div class="signal-label">Meetings Accepted</div>
+                            <div class="signal-value">${recentSignals.calendar.accepted}</div>
+                            <div class="signal-trend">Last 24h</div>
+                        </div>
+                    `;
+                } else {
+                    widget.style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Failed to load engagement signals:', error);
+                widget.style.display = 'none';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+            loadOrchestrator();
+            loadEngagementSignals();
+            
+            // Refresh engagement signals every 30 seconds
+            setInterval(loadEngagementSignals, 30000);
+        });
     </script>
 </body>
 </html>

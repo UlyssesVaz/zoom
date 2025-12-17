@@ -287,9 +287,8 @@ async function loadPipeline() {
   try {
     const deals = await window.dataService.getPipeline();
     
-    // Calculate and render summary
-    const metrics = calculateSummaryMetrics(deals);
-    renderSummary(metrics);
+    // Load next meeting card
+    await loadNextMeetingCard(deals);
     
     // Sort deals by score (highest first)
     deals.sort((a, b) => calculateDealScore(b) - calculateDealScore(a));
@@ -317,6 +316,89 @@ async function loadPipeline() {
         </td>
       </tr>
     `;
+  }
+}
+
+/**
+ * Load and display next meeting card
+ */
+async function loadNextMeetingCard(deals) {
+  const nextMeetingCard = document.getElementById('next-meeting-card');
+  const nextMeetingTitle = document.getElementById('next-meeting-title');
+  const nextMeetingTime = document.getElementById('next-meeting-time');
+  const openDealBtn = document.getElementById('open-deal-btn');
+  
+  if (!nextMeetingCard) return;
+  
+  // Try to get next meeting from calendar
+  if (window.googleCalendarService && window.googleCalendarService.isAvailable()) {
+    try {
+      const events = await window.googleCalendarService.getEvents({ 
+        timeMin: new Date().toISOString(),
+        maxResults: 10
+      });
+      
+      // Find next event with meeting info or linked to a deal
+      const now = new Date();
+      const upcomingEvents = events
+        .filter(e => e.start && new Date(e.start) >= now)
+        .sort((a, b) => new Date(a.start) - new Date(b.start));
+      
+      for (const event of upcomingEvents) {
+        // Check if event is linked to a deal
+        let dealId = event.dealId;
+        
+        // If not linked, try to match by name/attendees
+        if (!dealId && deals.length > 0) {
+          dealId = window.googleCalendarService.matchEventToDeal(event, deals);
+        }
+        
+        if (dealId) {
+          const deal = deals.find(d => d.id === dealId);
+          if (deal) {
+            const startTime = new Date(event.start);
+            const minutesUntil = Math.floor((startTime - now) / 60000);
+            
+            // Only show if meeting is within next 24 hours
+            if (minutesUntil >= 0 && minutesUntil <= 1440) {
+              nextMeetingTitle.textContent = event.summary || `${deal.name} Meeting`;
+              
+              if (minutesUntil < 60) {
+                nextMeetingTime.textContent = `In ${minutesUntil} minutes`;
+              } else {
+                const hours = Math.floor(minutesUntil / 60);
+                const minutes = minutesUntil % 60;
+                if (minutes === 0) {
+                  nextMeetingTime.textContent = `In ${hours} hour${hours > 1 ? 's' : ''}`;
+                } else {
+                  nextMeetingTime.textContent = `In ${hours}h ${minutes}m`;
+                }
+              }
+              
+              // Store deal ID for button click
+              openDealBtn.dataset.dealId = dealId;
+              nextMeetingCard.style.display = 'flex';
+              return;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load next meeting:', e);
+    }
+  }
+  
+  // No upcoming meeting found - hide card
+  nextMeetingCard.style.display = 'none';
+}
+
+/**
+ * Open deal sidebar for next meeting
+ */
+function openNextMeetingDeal() {
+  const dealId = document.getElementById('open-deal-btn').dataset.dealId;
+  if (dealId) {
+    openDealSidebar(dealId);
   }
 }
 
@@ -407,6 +489,9 @@ function loadTabContent(tabName, deal) {
       break;
     case 'activity':
       loadActivityTab(deal);
+      break;
+    case 'tasks':
+      loadTasksTab(deal);
       break;
   }
 }
@@ -584,21 +669,33 @@ async function joinZoomCall() {
  * 3. Prompt user if not found
  */
 async function joinZoomCallWithDeal(deal) {
-  let meetingNumber = null;
-  let meetingPassword = null;
+  let meetingInfo = null;
+  let preferredPlatform = null;
   
   // Try to get meeting info from calendar events first
   if (window.googleCalendarService && window.googleCalendarService.isAvailable()) {
     try {
       const dealEvents = await window.googleCalendarService.getDealEvents(deal.id);
-      // Find upcoming event with Zoom meeting
+      // Find upcoming event with meeting info
       const upcomingEvent = dealEvents
         .filter(event => event.start && new Date(event.start) >= new Date())
         .sort((a, b) => new Date(a.start) - new Date(b.start))[0];
       
-      if (upcomingEvent && upcomingEvent.zoomMeeting) {
-        meetingNumber = upcomingEvent.zoomMeeting.meetingNumber;
-        meetingPassword = upcomingEvent.zoomMeeting.password || null;
+      if (upcomingEvent) {
+        // Use new meetingInfo if available, fallback to zoomMeeting for backward compatibility
+        if (upcomingEvent.meetingInfo) {
+          meetingInfo = upcomingEvent.meetingInfo;
+        } else if (upcomingEvent.zoomMeeting) {
+          meetingInfo = {
+            platform: 'zoom',
+            meetingNumber: upcomingEvent.zoomMeeting.meetingNumber,
+            password: upcomingEvent.zoomMeeting.password || null,
+            joinUrl: upcomingEvent.zoomMeeting.joinUrl
+          };
+        } else if (upcomingEvent.hangoutLink) {
+          // Check if it's a Google Meet link
+          meetingInfo = window.meetingService.extractGoogleMeetInfo(upcomingEvent.hangoutLink);
+        }
       }
     } catch (error) {
       console.error('Failed to get calendar events:', error);
@@ -606,44 +703,67 @@ async function joinZoomCallWithDeal(deal) {
   }
   
   // Fall back to deal's stored meeting info
-  if (!meetingNumber) {
-    meetingNumber = deal.meetingNumber || null;
-    meetingPassword = deal.meetingPassword || null;
+  if (!meetingInfo) {
+    if (deal.meetingNumber) {
+      meetingInfo = {
+        platform: 'zoom',
+        meetingNumber: deal.meetingNumber,
+        password: deal.meetingPassword || null,
+        joinUrl: `https://zoom.us/j/${deal.meetingNumber}`
+      };
+    } else if (deal.meetingLink) {
+      meetingInfo = window.meetingService.extractMeetingInfo(deal.meetingLink);
+    }
   }
   
   // Fall back to localStorage/defaults
-  if (!meetingNumber) {
-    meetingNumber = localStorage.getItem('celera_meeting_number') || '';
-    meetingPassword = localStorage.getItem('celera_meeting_password') || '';
+  if (!meetingInfo) {
+    const storedMeetingNumber = localStorage.getItem('celera_meeting_number');
+    const storedMeetingLink = localStorage.getItem('celera_meeting_link');
+    
+    if (storedMeetingLink) {
+      meetingInfo = window.meetingService.extractMeetingInfo(storedMeetingLink);
+    } else if (storedMeetingNumber) {
+      meetingInfo = {
+        platform: 'zoom',
+        meetingNumber: storedMeetingNumber,
+        password: localStorage.getItem('celera_meeting_password') || null,
+        joinUrl: `https://zoom.us/j/${storedMeetingNumber}`
+      };
+    }
   }
   
-  // If still no meeting number, prompt user with better UX
-  if (!meetingNumber) {
-    meetingNumber = prompt('Enter Zoom Meeting Number:');
-    if (!meetingNumber || !meetingNumber.trim()) {
+  // If still no meeting info, prompt user
+  if (!meetingInfo) {
+    const userInput = prompt('Enter meeting link or number (Zoom/Google Meet):');
+    if (!userInput || !userInput.trim()) {
       return; // User cancelled
     }
-    meetingNumber = meetingNumber.trim();
     
-    // Remove any non-numeric characters (in case user pastes full Zoom URL)
-    meetingNumber = meetingNumber.replace(/\D/g, '');
+    meetingInfo = window.meetingService.extractMeetingInfo(userInput.trim());
     
-    if (meetingNumber.length < 9) {
-      alert('Invalid meeting number. Please enter a valid Zoom meeting number (9-11 digits).');
-      return;
+    if (!meetingInfo) {
+      // Try to detect platform and prompt accordingly
+      const platform = window.meetingService.getDefaultProvider();
+      if (platform === 'zoom') {
+        const meetingNumber = userInput.replace(/\D/g, '');
+        if (meetingNumber.length >= 9) {
+          const password = prompt('Enter Meeting Password (optional - leave blank if none):');
+          meetingInfo = {
+            platform: 'zoom',
+            meetingNumber: meetingNumber,
+            password: password ? password.trim() : null,
+            joinUrl: `https://zoom.us/j/${meetingNumber}`
+          };
+        } else {
+          alert('Invalid meeting number. Please enter a valid Zoom meeting number (9-11 digits) or a meeting link.');
+          return;
+        }
+      } else {
+        alert('Could not detect meeting platform. Please enter a full meeting link.');
+        return;
+      }
     }
-    
-    meetingPassword = prompt('Enter Meeting Password (optional - leave blank if none):');
-    if (meetingPassword) {
-      meetingPassword = meetingPassword.trim();
-    } else {
-      meetingPassword = null;
-    }
-  }
-  
-  if (!meetingNumber) {
-    alert('Meeting number is required to join the call');
-    return;
   }
   
   // Get display name
@@ -663,15 +783,26 @@ async function joinZoomCallWithDeal(deal) {
   sessionStorage.setItem('celera_crm_context', JSON.stringify(crmContext));
   sessionStorage.setItem('celera_lead_deal_id', deal.id);
   sessionStorage.setItem('celera_user_name', displayName);
-  sessionStorage.setItem('celera_meeting_number', meetingNumber);
+  sessionStorage.setItem('celera_meeting_platform', meetingInfo.platform);
   sessionStorage.setItem('celera_meeting_start_time', new Date().toISOString());
   
-  if (meetingPassword) {
-    sessionStorage.setItem('celera_meeting_password', meetingPassword);
+  // Store platform-specific meeting identifier
+  if (meetingInfo.platform === 'zoom') {
+    sessionStorage.setItem('celera_meeting_number', meetingInfo.meetingNumber);
+    if (meetingInfo.password) {
+      sessionStorage.setItem('celera_meeting_password', meetingInfo.password);
+    }
+  } else if (meetingInfo.platform === 'google-meet') {
+    sessionStorage.setItem('celera_meeting_code', meetingInfo.meetingCode);
   }
   
-  // Get signature from auth endpoint
-  await joinZoomMeeting(meetingNumber, meetingPassword, displayName);
+  // Join meeting using meeting service
+  try {
+    await window.meetingService.joinMeeting(meetingInfo, displayName);
+  } catch (error) {
+    console.error('Failed to join meeting:', error);
+    alert(`Failed to join meeting: ${error.message}`);
+  }
 }
 
 /**
@@ -967,6 +1098,161 @@ function formatActivityTime(date) {
   if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
   
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+}
+
+function loadTasksTab(deal) {
+  const content = document.getElementById('sidebar-tasks-content');
+  
+  if (!window.todoService) {
+    content.innerHTML = '<p style="color: var(--text-secondary);">Task service not available</p>';
+    return;
+  }
+  
+  const dealTasks = window.todoService.getDealTasks(deal.id);
+  const allTasks = dealTasks.length > 0 ? dealTasks : window.todoService.getTasks({ dealId: deal.id });
+  
+  if (allTasks.length === 0) {
+    content.innerHTML = `
+      <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+        <p>No tasks for this deal</p>
+        <button class="deal-sidebar-btn" onclick="createQuickTask()" style="margin-top: 1rem;">Create First Task</button>
+      </div>
+    `;
+    return;
+  }
+  
+  content.innerHTML = allTasks.map(task => {
+    const dueDate = task.dueDate ? new Date(task.dueDate) : null;
+    const now = new Date();
+    let dueDateClass = '';
+    let dueDateText = '';
+    
+    if (dueDate) {
+      if (dueDate < now && !task.completed) {
+        dueDateClass = 'overdue';
+        dueDateText = 'Overdue';
+      } else if (dueDate.toDateString() === now.toDateString()) {
+        dueDateClass = 'today';
+        dueDateText = 'Due today';
+      } else {
+        dueDateText = formatTaskDate(dueDate);
+      }
+    }
+    
+    const isEmailTask = task.metadata?.type === 'email_followup';
+    const hasPreComposedEmail = task.metadata?.preComposedEmail !== null && task.metadata?.preComposedEmail !== undefined;
+    
+    return `
+      <div class="activity-item" style="display: flex; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem; padding-bottom: ${isEmailTask && hasPreComposedEmail ? '0.75rem' : '0'}; border-bottom: ${isEmailTask && hasPreComposedEmail ? '1px solid var(--border-color)' : 'none'};">
+        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+               onchange="toggleDealTask('${task.id}')" 
+               style="margin-top: 0.25rem; cursor: pointer; width: 18px; height: 18px;">
+        <div style="flex: 1;">
+          <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem; ${task.completed ? 'text-decoration: line-through; opacity: 0.6;' : ''}">
+            ${escapeHtmlTask(task.title)}
+            ${isEmailTask ? '<span style="margin-left: 0.5rem; padding: 0.125rem 0.5rem; background: rgba(102, 126, 234, 0.15); color: var(--accent-color); border-radius: 12px; font-size: 0.7rem; font-weight: 600;">📧 Email</span>' : ''}
+          </div>
+          <div style="display: flex; gap: 0.75rem; font-size: 0.85rem; color: var(--text-secondary); flex-wrap: wrap; margin-bottom: ${isEmailTask && hasPreComposedEmail ? '0.5rem' : '0'};">
+            ${dueDate ? `<span style="${dueDateClass === 'overdue' ? 'color: var(--error-color); font-weight: 600;' : dueDateClass === 'today' ? 'color: var(--warning-color); font-weight: 600;' : ''}">📅 ${dueDateText}</span>` : ''}
+            <span style="padding: 0.25rem 0.5rem; background: ${task.priority === 'high' ? 'rgba(239, 68, 68, 0.15)' : task.priority === 'medium' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(156, 163, 175, 0.15)'}; border-radius: 12px; font-size: 0.75rem; color: ${task.priority === 'high' ? 'var(--error-color)' : task.priority === 'medium' ? 'var(--warning-color)' : 'var(--text-secondary)'};">
+              ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+            </span>
+            ${task.source === 'call' ? '<span>📞 From call</span>' : ''}
+          </div>
+          ${isEmailTask && hasPreComposedEmail ? `
+            <button class="deal-sidebar-btn" onclick="window.location.href='/todo.html?taskId=${task.id}'" style="width: 100%; margin-top: 0.5rem; background: var(--accent-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.85rem;">
+              📧 View & Send Email
+            </button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleDealTask(taskId) {
+  if (window.todoService) {
+    window.todoService.toggleTask(taskId);
+    // Reload tasks tab if currently viewing it
+    if (currentDealData) {
+      const activeTab = document.querySelector('.deal-sidebar-tab.active');
+      if (activeTab && activeTab.dataset.tab === 'tasks') {
+        loadTasksTab(currentDealData);
+      }
+    }
+  }
+}
+
+/**
+ * Send email from task (opens modal to view and send)
+ * This function can be called from deal sidebar tasks tab
+ */
+async function sendEmailFromTask(taskId) {
+  // Redirect to todo page with task modal open, or open modal if we're on todo page
+  if (window.location.pathname.includes('todo.html')) {
+    // We're on todo page, just open the modal
+    if (typeof editTask === 'function') {
+      editTask(taskId);
+    }
+  } else {
+    // We're on deal sidebar, redirect to todo page
+    window.location.href = `/todo.html?taskId=${taskId}`;
+  }
+}
+
+function createQuickTask() {
+  if (!currentDealData) {
+    alert('No deal selected');
+    return;
+  }
+  
+  const taskTitle = prompt('Enter task title:');
+  if (!taskTitle || !taskTitle.trim()) {
+    return;
+  }
+  
+  if (!window.todoService) {
+    alert('Task service not available');
+    return;
+  }
+  
+  const task = window.todoService.createTask({
+    title: taskTitle.trim(),
+    dealId: currentDealData.id,
+    dealName: currentDealData.accountName || currentDealData.name,
+    priority: 'medium',
+    source: 'manual'
+  });
+  
+  // Reload tasks tab if currently viewing it
+  const activeTab = document.querySelector('.deal-sidebar-tab.active');
+  if (activeTab && activeTab.dataset.tab === 'tasks') {
+    loadTasksTab(currentDealData);
+  } else {
+    // Switch to tasks tab
+    switchTab('tasks');
+  }
+}
+
+function formatTaskDate(date) {
+  const now = new Date();
+  const diffTime = date - now;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Tomorrow';
+  if (diffDays === -1) return 'Yesterday';
+  if (diffDays > 0 && diffDays <= 7) return `In ${diffDays} days`;
+  if (diffDays < 0 && diffDays >= -7) return `${Math.abs(diffDays)} days ago`;
+  
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function escapeHtmlTask(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 

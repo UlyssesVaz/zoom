@@ -6,53 +6,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="../css/celera.css">
     <style>
-        /* Summary Metrics Row */
-        .pipeline-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        .summary-card {
-            background: var(--card-bg);
+        /* Next Meeting Card */
+        .next-meeting-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(102, 126, 234, 0.05) 100%);
+            border: 1px solid var(--accent-color);
             border-radius: 12px;
-            padding: 1.25rem;
-            border: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
             transition: all 0.2s;
         }
-        .summary-card:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        .next-meeting-card:hover {
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
         }
-        .summary-label {
+        .next-meeting-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+        .next-meeting-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .next-meeting-label {
             font-size: 0.75rem;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
             font-weight: 600;
         }
-        .summary-value {
-            font-size: 1.5rem;
-            font-weight: 700;
+        .next-meeting-title {
+            font-size: 1rem;
+            font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 0.25rem;
+            word-wrap: break-word;
         }
-        .summary-count {
+        .next-meeting-time {
             font-size: 0.85rem;
             color: var(--text-secondary);
         }
-        .summary-trend {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.75rem;
-            margin-top: 0.5rem;
+        .next-meeting-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
         }
-        .summary-trend.up {
-            color: var(--success-color);
-        }
-        .summary-trend.down {
-            color: var(--error-color);
+        .next-meeting-btn:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
         }
 
         /* Context Bar - Simplified */
@@ -543,6 +553,12 @@
                     </a>
                 </li>
                 <li class="sidebar-nav-item">
+                    <a href="/todo.html" class="sidebar-nav-link">
+                        <i>✅</i>
+                        <span>Tasks</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
                     <a href="/social-graph.html" class="sidebar-nav-link">
                         <i>🕸️</i>
                         <span>Social Graph</span>
@@ -635,9 +651,17 @@
             <h1>Deals Pipeline</h1>
         </div>
 
-        <!-- Summary Metrics -->
-        <div class="pipeline-summary" id="pipeline-summary">
-            <!-- Will be populated by JavaScript -->
+        <!-- Next Meeting Card -->
+        <div class="next-meeting-card" id="next-meeting-card" style="display: none;">
+            <div class="next-meeting-icon">📞</div>
+            <div class="next-meeting-content">
+                <div class="next-meeting-label">Next Meeting</div>
+                <div class="next-meeting-title" id="next-meeting-title">Loading...</div>
+                <div class="next-meeting-time" id="next-meeting-time"></div>
+            </div>
+            <button class="next-meeting-btn" id="open-deal-btn" onclick="openNextMeetingDeal()">
+                Open Account →
+            </button>
         </div>
 
         <!-- Context Bar -->
@@ -745,6 +769,21 @@
                         <div id="sidebar-activity-content">Loading...</div>
                     </div>
                 </div>
+                <!-- Tasks Tab -->
+                <div class="deal-sidebar-tab-content" id="tab-tasks">
+                    <div class="deal-sidebar-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div class="deal-sidebar-section-title">Tasks</div>
+                            <button class="deal-sidebar-btn" onclick="createQuickTask()" style="padding: 0.5rem 1rem; font-size: 0.85rem;">+ New Task</button>
+                        </div>
+                        <div id="sidebar-tasks-content">Loading...</div>
+                        <div style="margin-top: 1rem; text-align: center;">
+                            <a href="/todo.html" class="deal-sidebar-link" style="display: inline-block;">
+                                View All Tasks →
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -753,7 +792,10 @@
     <script src="../js/hubspot-service.js"></script>
     <script src="../js/linkedin-service.js"></script>
     <script src="../js/data-service.js"></script>
+    <script src="../js/todo-service.js"></script>
+    <script src="../js/google-calendar-service.js"></script>
     <script src="../js/navigation.js"></script>
+    <script src="../js/meeting-service.js"></script>
     <script src="../js/pipeline.js"></script>
 </body>
 </html>

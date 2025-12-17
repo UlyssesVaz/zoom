@@ -367,6 +367,26 @@ class DataService {
   }
 
   /**
+   * Save activity to a deal
+   * @param {string} dealId - Deal ID
+   * @param {Object} activity - Activity object
+   * @returns {Promise<Object>} Saved activity
+   */
+  async saveDealActivity(dealId, activity) {
+    // Store in sessionStorage (per-deal and global)
+    const dealActivities = JSON.parse(sessionStorage.getItem(`celera_deal_${dealId}_activities`) || '[]');
+    dealActivities.push(activity);
+    sessionStorage.setItem(`celera_deal_${dealId}_activities`, JSON.stringify(dealActivities));
+    
+    // Also store in global activities
+    const allActivities = JSON.parse(sessionStorage.getItem('celera_deal_activities') || '[]');
+    allActivities.push(activity);
+    sessionStorage.setItem('celera_deal_activities', JSON.stringify(allActivities));
+    
+    return Promise.resolve(activity);
+  }
+
+  /**
    * Format date for display
    */
   formatDate(dateString) {
