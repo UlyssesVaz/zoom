@@ -1,5 +1,7 @@
 /Local/node_modules
 /CDN/node_modules
+/meetingsdk-auth-endpoint-sample/node_modules
+/Components/node_modules
 /Local/package-lock.json
 /Local/yarn.lock
 /CDN/yarn.lock

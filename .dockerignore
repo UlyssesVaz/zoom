@@ -3,7 +3,8 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
+# Only exclude root-level package-lock.json, allow in subdirectories (needed for npm ci)
+/package-lock.json
 
 # Build outputs
 dist/
