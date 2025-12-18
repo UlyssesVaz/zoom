@@ -8,14 +8,26 @@ RUN addgroup -g 1001 -S nodejs && \
 # Set working directory
 WORKDIR /app
 
+# DEBUG: Check what's actually in the build context
+RUN ls -la / || echo "Checking build context..."
+
 # Copy package files first (for better layer caching)
 COPY meetingsdk-auth-endpoint-sample/package*.json ./
 
 # Install dependencies
 RUN npm ci --only=production --ignore-scripts
 
-# Copy source files
-COPY --chown=auth:nodejs meetingsdk-auth-endpoint-sample/src ./src
+# DEBUG: List what we can see before copying src
+RUN echo "About to copy src directory..."
+
+# Copy the entire meetingsdk-auth-endpoint-sample directory first to verify it exists
+COPY --chown=auth:nodejs meetingsdk-auth-endpoint-sample/ ./temp-auth/
+
+# DEBUG: See what we got
+RUN ls -la ./temp-auth/ && ls -la ./temp-auth/src/ || echo "src directory check"
+
+# Move src to expected location
+RUN mv ./temp-auth/src ./src && rm -rf ./temp-auth
 
 # Set environment variables
 ENV NODE_ENV=production
