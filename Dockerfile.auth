@@ -8,14 +8,14 @@ RUN addgroup -g 1001 -S nodejs && \
 # Set working directory
 WORKDIR /app
 
-# Copy package files from auth endpoint directory
+# Copy package files first (for better layer caching)
 COPY meetingsdk-auth-endpoint-sample/package*.json ./
 
 # Install dependencies
 RUN npm ci --only=production --ignore-scripts
 
-# Copy application files
-COPY --chown=auth:nodejs meetingsdk-auth-endpoint-sample/src/ ./src/
+# Copy source files
+COPY --chown=auth:nodejs meetingsdk-auth-endpoint-sample/src ./src
 
 # Set environment variables
 ENV NODE_ENV=production
