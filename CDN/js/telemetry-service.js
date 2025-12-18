@@ -166,3 +166,4 @@ class TelemetryService {
 // Export singleton instance
 window.telemetryService = new TelemetryService();
 
+

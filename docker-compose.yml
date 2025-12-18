@@ -28,7 +28,7 @@ services:
   # Auth endpoint service
   celera-auth:
     build:
-      context: ./meetingsdk-auth-endpoint-sample
+      context: .
       dockerfile: Dockerfile.auth
     container_name: celera-auth
     ports:

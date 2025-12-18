@@ -134,3 +134,4 @@ class CalendarTelemetryService {
 // Export singleton instance
 window.calendarTelemetryService = new CalendarTelemetryService();
 
+

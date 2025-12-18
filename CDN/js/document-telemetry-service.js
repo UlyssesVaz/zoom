@@ -142,3 +142,4 @@ class DocumentTelemetryService {
 // Export singleton instance
 window.documentTelemetryService = new DocumentTelemetryService();
 
+
