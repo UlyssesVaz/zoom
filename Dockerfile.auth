@@ -11,8 +11,9 @@ WORKDIR /app
 # DEBUG: Check what's actually in the build context
 RUN ls -la / || echo "Checking build context..."
 
-# Copy package files first (for better layer caching)
-COPY meetingsdk-auth-endpoint-sample/package*.json ./
+# Copy package files explicitly (include package-lock.json)
+COPY meetingsdk-auth-endpoint-sample/package.json ./
+COPY meetingsdk-auth-endpoint-sample/package-lock.json ./
 
 # Install dependencies
 RUN npm ci --only=production --ignore-scripts
@@ -20,7 +21,7 @@ RUN npm ci --only=production --ignore-scripts
 # DEBUG: List what we can see before copying src
 RUN echo "About to copy src directory..."
 
-# Copy the entire meetingsdk-auth-endpoint-sample directory first to verify it exists
+# Copy the entire meetingsdk-auth-endpoint-sample directory
 COPY --chown=auth:nodejs meetingsdk-auth-endpoint-sample/ ./temp-auth/
 
 # DEBUG: See what we got

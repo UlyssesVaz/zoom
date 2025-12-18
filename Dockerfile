@@ -10,8 +10,9 @@ WORKDIR /app
 # Install build dependencies
 RUN apk add --no-cache python3 make g++
 
-# Copy package files
-COPY CDN/package*.json ./CDN/
+# Copy package files (explicitly include package-lock.json)
+COPY CDN/package.json ./CDN/
+COPY CDN/package-lock.json ./CDN/
 
 # Install dependencies
 RUN cd CDN && npm ci --only=production --ignore-scripts
@@ -32,13 +33,17 @@ COPY --from=builder --chown=celera:nodejs /app/CDN/node_modules ./CDN/node_modul
 # Copy application files
 COPY --chown=celera:nodejs CDN/ ./CDN/
 
+# Copy production server
+COPY --chown=celera:nodejs CDN/server.js ./CDN/server.js
+
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=9999
 ENV WEBHOOK_PORT=4001
+ENV AUTH_PORT=4000
 
 # Expose ports
-EXPOSE 9999 4001
+EXPOSE 9999 4000 4001
 
 # Switch to non-root user
 USER celera
@@ -47,6 +52,6 @@ USER celera
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:9999/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Start the server
+# Start services using a process manager script
 CMD ["node", "CDN/server.js"]
 
