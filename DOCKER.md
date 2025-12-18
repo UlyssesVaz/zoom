@@ -1,187 +1,245 @@
-# Docker Setup for Celera
+# Docker Setup Guide
 
-This document describes how to build and run Celera using Docker.
-
-## Prerequisites
-
-- Docker Engine 20.10+
-- Docker Compose 2.0+ (optional, for docker-compose)
-
-## Quick Start
-
-### Using Docker Compose (Recommended)
-
-1. **Set up environment variables:**
-
-   Create a `.env` file in the root directory:
-   ```env
-   ZOOM_MEETING_SDK_KEY=your_sdk_key_here
-   ZOOM_MEETING_SDK_SECRET=your_sdk_secret_here
-   # or
-   CLIENT_SECRET=your_client_secret_here
-   ```
-
-2. **Build and start services:**
-
-   ```bash
-   docker-compose up -d
-   ```
-
-3. **Access the application:**
-
-   - Main app: http://localhost:9999
-   - Auth endpoint: http://localhost:4000
-   - Webhook endpoint: http://localhost:9999/webhook/recording
-
-4. **View logs:**
-
-   ```bash
-   docker-compose logs -f
-   ```
-
-5. **Stop services:**
-
-   ```bash
-   docker-compose down
-   ```
-
-### Using Docker Directly
-
-1. **Build the image:**
-
-   ```bash
-   docker build -t celera:latest .
-   ```
-
-2. **Run the container:**
-
-   ```bash
-   docker run -d \
-     --name celera-app \
-     -p 9999:9999 \
-     -p 4001:4001 \
-     -e NODE_ENV=production \
-     celera:latest
-   ```
-
-3. **Access the application:**
-
-   - Main app: http://localhost:9999
+This project uses Docker and Docker Compose to run the Celera application with best practices.
 
 ## Architecture
 
-The Docker setup includes:
+The application consists of two main services:
 
-1. **celera-app**: Main application server
-   - Serves static files (HTML, CSS, JS)
-   - Handles webhook endpoints
-   - Handles telemetry endpoints
-   - Port: 9999
+1. **CDN Frontend** (`cdn` service)
+   - Serves static files and webhook endpoints
+   - Runs on port 9999 (configurable via `CDN_PORT`)
+   - Automatically redirects root (`/`) to `/dashboard.html`
 
-2. **celera-auth**: Zoom Meeting SDK Auth Endpoint
-   - Generates JWT tokens for meeting authentication
-   - Port: 4000
-   - Requires: `ZOOM_MEETING_SDK_KEY` and `ZOOM_MEETING_SDK_SECRET`
+2. **Auth Endpoint Backend** (`auth-endpoint` service)
+   - Generates Meeting SDK JWTs for Zoom integration
+   - Runs on port 4000 (configurable via `AUTH_PORT`)
+   - Requires Zoom Meeting SDK credentials
+
+## Prerequisites
+
+- Docker Engine 20.10+ 
+- Docker Compose 2.0+
+- Zoom Meeting SDK credentials (Key and Secret)
+
+## Quick Start
+
+1. **Clone and navigate to the project:**
+   ```bash
+   cd zoom-sdk-web-5.0.0
+   ```
+
+2. **Create environment file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Edit `.env` file with your credentials:**
+   ```env
+   ZOOM_MEETING_SDK_KEY=your_actual_key
+   ZOOM_MEETING_SDK_SECRET=your_actual_secret
+   ```
+
+4. **Build and start services:**
+   ```bash
+   docker-compose up --build
+   ```
+
+5. **Access the application:**
+   - Frontend: http://localhost:9999/dashboard.html (or http://localhost:9999/ - auto-redirects)
+   - Backend: http://localhost:4000
+
+## Docker Commands
+
+### Build and Start
+```bash
+# Build and start in foreground
+docker-compose up --build
+
+# Build and start in background
+docker-compose up -d --build
+```
+
+### Stop Services
+```bash
+# Stop services
+docker-compose stop
+
+# Stop and remove containers
+docker-compose down
+
+# Stop and remove containers, volumes, and networks
+docker-compose down -v
+```
+
+### View Logs
+```bash
+# All services
+docker-compose logs -f
+
+# Specific service
+docker-compose logs -f cdn
+docker-compose logs -f auth-endpoint
+```
+
+### Rebuild After Changes
+```bash
+# Rebuild specific service
+docker-compose build cdn
+docker-compose build auth-endpoint
+
+# Rebuild and restart
+docker-compose up -d --build
+```
+
+### Check Service Status
+```bash
+# List running containers
+docker-compose ps
+
+# Check health status
+docker-compose ps
+```
 
 ## Environment Variables
 
-### Main Application (celera-app)
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `CDN_PORT` | Frontend service port | 9999 |
+| `AUTH_PORT` | Backend service port | 4000 |
+| `WEBHOOK_PORT` | Webhook server port (if different from CDN_PORT) | 4001 |
+| `ZOOM_MEETING_SDK_KEY` | Zoom Meeting SDK Key | **Required** |
+| `ZOOM_MEETING_SDK_SECRET` | Zoom Meeting SDK Secret | **Required** |
 
-- `PORT`: Main server port (default: 9999)
-- `WEBHOOK_PORT`: Webhook server port (default: 4001)
-- `NODE_ENV`: Environment (production/development)
+## Production Deployment
 
-### Auth Endpoint (celera-auth)
+### Security Best Practices
 
-- `PORT`: Auth server port (default: 4000)
-- `ZOOM_MEETING_SDK_KEY`: Your Zoom Meeting SDK Key
-- `ZOOM_MEETING_SDK_SECRET`: Your Zoom Meeting SDK Secret
-- `CLIENT_SECRET`: Alternative to SDK Secret (legacy)
+1. **Never commit `.env` file** - It contains sensitive credentials
+2. **Use Docker secrets** or environment variables from your hosting platform
+3. **Use HTTPS** - Configure reverse proxy (nginx/traefik) in front of containers
+4. **Regular updates** - Keep base images and dependencies updated
 
-## Production Considerations
+### Production Docker Compose Override
 
-### Security
-
-- The containers run as non-root users (UID 1001)
-- Health checks are configured for all services
-- Environment variables should be managed securely (use secrets management)
-
-### Performance
-
-- Uses Alpine Linux for smaller image size
-- Multi-stage build reduces final image size
-- Static files are served efficiently via Express
-
-### Scaling
-
-For production scaling, consider:
-
-1. **Load Balancing**: Use nginx or Traefik in front of the containers
-2. **Database**: Replace in-memory webhook storage with a database
-3. **Caching**: Add Redis for session/cache management
-4. **Monitoring**: Add Prometheus/Grafana for metrics
-
-### Example Production Setup
+Create `docker-compose.prod.yml`:
 
 ```yaml
-# docker-compose.prod.yml
 version: '3.8'
 
 services:
-  celera-app:
-    build: .
-    deploy:
-      replicas: 3
-    environment:
-      - NODE_ENV=production
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
+  cdn:
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    # Remove volume mounts for production
+
+  auth-endpoint:
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+```
+
+Run with:
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+```
+
+### Using Environment Variables Directly
+
+Instead of `.env` file, you can set environment variables:
+
+```bash
+export ZOOM_MEETING_SDK_KEY=your_key
+export ZOOM_MEETING_SDK_SECRET=your_secret
+docker-compose up -d
 ```
 
 ## Troubleshooting
 
-### Container won't start
-
-1. Check logs: `docker-compose logs celera-app`
-2. Verify ports aren't in use: `netstat -an | grep 9999`
-3. Check environment variables: `docker-compose config`
-
-### Health check failing
-
-1. Check if the service is responding: `curl http://localhost:9999/health`
-2. Review container logs for errors
-3. Verify all dependencies are installed
-
-### Webhook not receiving events
-
-1. Ensure webhook endpoint is accessible: `curl -X POST http://localhost:9999/webhook/recording`
-2. Check firewall/network settings
-3. Verify webhook URL is correctly configured in Zoom
-
-## Development
-
-For local development, you can still use:
-
+### Port Already in Use
 ```bash
-cd CDN
-npm start
+# Change ports in .env file or docker-compose.yml
+CDN_PORT=9998
+AUTH_PORT=4001
 ```
 
-Docker is primarily for production deployments and CI/CD pipelines.
-
-## Building for Different Platforms
-
-To build for ARM64 (Apple Silicon, Raspberry Pi):
-
+### Container Won't Start
 ```bash
-docker buildx build --platform linux/arm64 -t celera:latest .
+# Check logs
+docker-compose logs cdn
+docker-compose logs auth-endpoint
+
+# Check health status
+docker inspect celera-cdn | grep Health -A 10
+docker inspect celera-auth-endpoint | grep Health -A 10
 ```
 
-For multi-platform builds:
-
+### Rebuild from Scratch
 ```bash
-docker buildx build --platform linux/amd64,linux/arm64 -t celera:latest .
+# Remove everything
+docker-compose down -v
+docker system prune -a
+
+# Rebuild
+docker-compose build --no-cache
+docker-compose up -d
 ```
 
+### Permission Issues
+The containers run as non-root user (UID 1001) for security. If you encounter permission issues:
 
+```bash
+# Check container user
+docker exec celera-cdn whoami
+docker exec celera-auth-endpoint whoami
+```
 
+## Architecture Details
+
+### Multi-Stage Builds
+- **Stage 1 (deps)**: Install production dependencies only
+- **Stage 2 (builder)**: Build assets (if needed)
+- **Stage 3 (runner)**: Final minimal image with only runtime files
+
+### Security Features
+- Non-root user execution (UID 1001)
+- Minimal Alpine Linux base images
+- Separate dependency installation for better caching
+- Health checks for container orchestration
+
+### Network
+- Services communicate via Docker bridge network (`celera-network`)
+- Services are isolated but can communicate using service names
+
+## Health Checks
+
+Both services include health checks:
+
+- **CDN**: `GET /health` endpoint
+- **Auth Endpoint**: `POST /` endpoint (returns 400 for missing body, which indicates server is running)
+
+Check health:
+```bash
+curl http://localhost:9999/health
+curl -X POST http://localhost:4000/ -H "Content-Type: application/json" -d '{}'
+```
+
+## Development vs Production
+
+### Development
+- Mount volumes for live code changes
+- Enable debug logging
+- Use development dependencies
+
+### Production
+- No volume mounts
+- Production dependencies only
+- Optimized builds
+- Proper logging configuration

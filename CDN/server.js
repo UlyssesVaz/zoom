@@ -84,12 +84,18 @@ app.get('/health', (req, res) => {
 // Serve static files
 app.use(express.static(path.join(__dirname)));
 
+// Redirect root to dashboard.html
+app.get('/', (req, res) => {
+  res.redirect('/dashboard.html');
+});
+
 // Handle client-side routing - serve index.html for all routes
 app.get('*', (req, res) => {
   // Don't serve index.html for API routes
   if (req.path.startsWith('/api/') || req.path.startsWith('/webhook/')) {
     return res.status(404).json({ error: 'Not found' });
   }
+  // If requesting a file that exists, serve it, otherwise serve index.html
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

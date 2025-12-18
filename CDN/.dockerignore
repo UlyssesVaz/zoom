@@ -1,8 +1,7 @@
 # Dependencies
-**/node_modules
+node_modules
 npm-debug.log
 yarn-error.log
-**/package-lock.json
 
 # Development files
 .env
@@ -27,19 +26,24 @@ Thumbs.db
 .gitignore
 .gitattributes
 
-# Documentation (keep README)
+# Documentation
 *.md
 !README.md
 
-# Docker files (don't copy into build context)
+# Docker
 Dockerfile
 .dockerignore
 docker-compose.yml
 
-# Build artifacts
+# Build artifacts (if any)
 dist
 build
 *.log
+
+# SSL certificates (should be handled via secrets)
+*.crt
+*.key
+*.pem
 
 # Test files
 test
@@ -48,8 +52,3 @@ __tests__
 *.test.js
 *.spec.js
 
-# Other folders that aren't needed
-Components
-Local
-meetingsdk-auth-endpoint-sample/node_modules
-CDN/node_modules
